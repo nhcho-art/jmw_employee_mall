@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JMW 임직원 MALL</title>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
@@ -351,6 +352,15 @@
   .order-total-row{ display:flex; justify-content:space-between; align-items:center; padding-top:14px; border-top:1px solid var(--border); font-size:14px; }
   .order-total-row b{ font-size:19px; color:var(--gold); }
 
+  .addr-search-row{ display:flex; gap:8px; }
+  .addr-search-row input{ flex:1; }
+  .addr-search-btn{
+    flex:none; padding:0 16px; height:38px; border:1.5px solid var(--brand);
+    background:#fff; color:var(--brand); border-radius:8px; font-size:12.5px; font-weight:600;
+    cursor:pointer; white-space:nowrap;
+  }
+  .addr-search-btn:hover{ background:var(--brand); color:#fff; }
+
   .order-actions{ display:flex; gap:10px; margin-top:18px; }
   .order-actions button{ margin-top:0; }
   .order-actions .cancel-btn{ flex:1; background:#fff; color:var(--ink); border:1.5px solid var(--border); border-radius:8px; height:46px; font-size:13.5px; font-weight:600; cursor:pointer; }
@@ -442,7 +452,12 @@
       </div>
       <div class="field-row">
         <label>배송주소</label>
-        <input id="ofAddr" type="text" placeholder="도로명 주소 + 상세주소">
+        <div class="addr-search-row">
+          <input id="ofZip" type="text" placeholder="우편번호" readonly>
+          <button type="button" class="addr-search-btn" onclick="execDaumPostcode()">주소 검색</button>
+        </div>
+        <input id="ofAddrBase" type="text" placeholder="기본주소 (검색 버튼으로 채워집니다)" readonly style="margin-top:8px;">
+        <input id="ofAddrDetail" type="text" placeholder="상세주소 입력 (동/호수 등)" style="margin-top:8px;">
       </div>
       <div class="field-row">
         <label>결제수단</label>
@@ -784,6 +799,21 @@ function closeCompareModal(){ document.getElementById('compareModalOverlay').cla
 /* ---------- 주문서 ---------- */
 let payMethod = '계좌이체';
 
+function execDaumPostcode(){
+  if(typeof daum === 'undefined' || !daum.Postcode){
+    alert('주소 검색 서비스를 불러오지 못했습니다. 네트워크 연결을 확인해주세요.');
+    return;
+  }
+  new daum.Postcode({
+    oncomplete: function(data){
+      const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+      document.getElementById('ofZip').value = data.zonecode;
+      document.getElementById('ofAddrBase').value = addr;
+      document.getElementById('ofAddrDetail').focus();
+    }
+  }).open();
+}
+
 function openOrderModal(){
   if(Object.keys(cart).length===0){ alert('장바구니가 비어있습니다.'); return; }
   renderOrderSummary();
@@ -825,8 +855,10 @@ function submitOrder(){
   const dept = document.getElementById('ofDept').value.trim();
   const name = document.getElementById('ofName').value.trim();
   const phone = document.getElementById('ofPhone').value.trim();
-  const addr = document.getElementById('ofAddr').value.trim();
-  if(!dept||!name||!phone||!addr){ alert('필수 항목을 모두 입력해주세요.'); return; }
+  const addrBase = document.getElementById('ofAddrBase').value.trim();
+  const addrDetail = document.getElementById('ofAddrDetail').value.trim();
+  if(!dept||!name||!phone||!addrBase){ alert('필수 항목을 모두 입력해주세요. (주소는 검색 버튼으로 입력)'); return; }
+  if(!addrDetail){ alert('상세주소를 입력해주세요.'); return; }
   if(payMethod==='계좌이체' && !document.getElementById('ofDepositor').value.trim()){
     alert('계좌이체 선택 시 입금자명은 필수입니다.'); return;
   }
