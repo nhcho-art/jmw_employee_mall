@@ -195,7 +195,11 @@
   .drawer-item .info{ flex:1; min-width:0; }
   .drawer-item .info .n{ font-size:13px; font-weight:600; }
   .drawer-item .info .p{ font-size:12.5px; color:var(--gold); font-weight:700; margin-top:2px; }
-  .drawer-item .remove{ background:none; border:none; color:var(--muted); font-size:11.5px; cursor:pointer; text-decoration:underline; margin-top:6px; }
+  .drawer-item .row2{ display:flex; align-items:center; justify-content:space-between; margin-top:6px; }
+  .drawer-item .remove{ background:none; border:none; color:var(--muted); font-size:11.5px; cursor:pointer; text-decoration:underline; }
+  .mini-stepper{ display:flex; align-items:center; border:1px solid var(--border); border-radius:6px; }
+  .mini-stepper button{ width:22px; height:24px; border:none; background:none; cursor:pointer; font-size:13px; color:var(--ink); }
+  .mini-stepper span{ width:22px; text-align:center; font-size:12px; }
 
   .drawer-foot{ padding:16px 20px 20px; border-top:1px solid var(--border); }
   .total-row{ display:flex; justify-content:space-between; font-size:14px; margin-bottom:12px; }
@@ -331,9 +335,22 @@
   .site-footer .sep{ color:var(--border); }
 
   .order-modal{ max-width:640px; }
-  table.order-items-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
-  table.order-items-table th, table.order-items-table td{ padding:8px 6px; border-bottom:1px solid var(--border); text-align:left; }
+  table.order-items-table{ width:100%; border-collapse:collapse; font-size:12.5px; table-layout:fixed; }
+  table.order-items-table th, table.order-items-table td{ padding:8px 6px; border-bottom:1px solid var(--border); text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   table.order-items-table th{ color:var(--muted); font-weight:600; font-size:11.5px; }
+  table.order-items-table th:nth-child(1), table.order-items-table td:nth-child(1){ width:50%; white-space:normal; }
+  table.order-items-table th:nth-child(2), table.order-items-table td:nth-child(2){ width:26%; text-align:center; }
+  table.order-items-table th:nth-child(3), table.order-items-table td:nth-child(3){ width:24%; text-align:right; font-variant-numeric:tabular-nums; }
+
+  .added-modal{ max-width:340px; text-align:center; }
+  .added-msg{ font-size:14.5px; font-weight:600; margin-bottom:20px; }
+  .added-actions{ display:flex; gap:10px; }
+  .added-actions button{
+    margin-top:0; flex:1; height:46px; border:none; border-radius:8px;
+    font-size:13.5px; font-weight:700; cursor:pointer;
+  }
+  .added-actions .cancel-btn{ background:var(--ink); color:#fff; }
+  .added-actions .submit-order-btn{ background:var(--brand); color:#fff; }
 
   .order-form{ display:flex; flex-direction:column; gap:14px; margin:18px 0; }
   .field-row label{ display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:5px; }
@@ -409,7 +426,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V2.3</span>
+    <span class="ver">V2.5</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -442,6 +459,17 @@
   </div>
 </aside>
 
+<!-- 담기 완료 선택 모달 -->
+<div class="modal-overlay" id="addedModalOverlay" onclick="if(event.target===this)closeAddedModal()">
+  <div class="modal-box added-modal">
+    <div class="added-msg">장바구니에 담았습니다.</div>
+    <div class="added-actions">
+      <button class="cancel-btn" onclick="closeAddedModal()">계속 쇼핑하기</button>
+      <button class="submit-order-btn" onclick="goToOrderFromAdded()">주문서로 이동</button>
+    </div>
+  </div>
+</div>
+
 <!-- 주문서 모달 -->
 <div class="modal-overlay" id="orderModalOverlay" onclick="if(event.target===this)closeOrderModal()">
   <div class="modal-box order-modal">
@@ -449,20 +477,20 @@
     <div id="orderSummary"></div>
     <div class="order-form">
       <div class="field-row">
-        <label>소속부서</label>
+        <label>소속부서 <span class="req">(필수)</span></label>
         <input id="ofDept" type="text" placeholder="예: 영업지원팀">
       </div>
       <div class="field-row two">
-        <div><label>주문자명</label><input id="ofName" type="text" oninput="syncRecipient()"></div>
-        <div><label>주문자 연락처</label><input id="ofPhone" type="text" placeholder="010-0000-0000" oninput="syncRecipient()"></div>
+        <div><label>주문자명 <span class="req">(필수)</span></label><input id="ofName" type="text" oninput="syncRecipient()"></div>
+        <div><label>주문자 연락처 <span class="req">(필수)</span></label><input id="ofPhone" type="text" placeholder="010-0000-0000" oninput="syncRecipient()"></div>
       </div>
       <label class="chk-row"><input type="checkbox" id="ofSameRecipient" checked onchange="syncRecipient()"> 수령인 정보 주문자와 동일</label>
       <div class="field-row two">
-        <div><label>수령인</label><input id="ofRecvName" type="text" disabled></div>
-        <div><label>수령인 연락처</label><input id="ofRecvPhone" type="text" placeholder="010-0000-0000" disabled></div>
+        <div><label>수령인 <span class="req">(필수)</span></label><input id="ofRecvName" type="text" disabled></div>
+        <div><label>수령인 연락처 <span class="req">(필수)</span></label><input id="ofRecvPhone" type="text" placeholder="010-0000-0000" disabled></div>
       </div>
       <div class="field-row">
-        <label>배송주소</label>
+        <label>배송주소 <span class="req">(필수)</span></label>
         <div class="addr-search-row">
           <input id="ofZip" type="text" placeholder="우편번호" readonly>
           <button type="button" class="addr-search-btn" onclick="execDaumPostcode()">주소 검색</button>
@@ -520,7 +548,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V2.3';
+const APP_VERSION = 'V2.5';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -733,7 +761,11 @@ function addToCart(id){
   if(qtyEl) qtyEl.textContent = finalQty;
   saveCart(cart);
   renderCartUI();
+  document.getElementById('addedModalOverlay').classList.add('show');
 }
+function closeAddedModal(){ document.getElementById('addedModalOverlay').classList.remove('show'); }
+function goToOrderFromAdded(){ closeAddedModal(); openOrderModal(); }
+
 function removeFromCart(id){
   delete cart[id];
   saveCart(cart);
@@ -741,6 +773,15 @@ function removeFromCart(id){
   if(qtyEl) qtyEl.textContent = 0;
   renderCartUI();
 }
+function changeCartQty(id, delta){
+  if(!cart[id]) return;
+  cart[id].qty += delta;
+  if(cart[id].qty<=0) delete cart[id];
+  saveCart(cart);
+  const qtyEl = document.getElementById('qty-'+id);
+  if(qtyEl) qtyEl.textContent = cart[id]?cart[id].qty:0;
+}
+function drawerQtyChange(id, delta){ changeCartQty(id, delta); renderCartUI(); }
 function cartCount(){ return Object.values(cart).reduce((s,i)=>s+i.qty,0); }
 function cartTotal(){ return Object.values(cart).reduce((s,i)=>s+i.qty*i.emp,0); }
 
@@ -759,7 +800,14 @@ function renderCartUI(){
         <div class="info">
           <div class="n">${i.name}</div>
           <div class="p">${fmt(i.emp)} × ${i.qty}</div>
-          <button onclick="removeFromCart('${i.id}')" class="remove">삭제</button>
+          <div class="row2">
+            <div class="mini-stepper">
+              <button onclick="drawerQtyChange('${i.id}',-1)">–</button>
+              <span>${i.qty}</span>
+              <button onclick="drawerQtyChange('${i.id}',1)">+</button>
+            </div>
+            <button onclick="removeFromCart('${i.id}')" class="remove">삭제</button>
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -863,16 +911,40 @@ function openOrderModal(){
   document.getElementById('ofCashReceiptNo').value = '';
   document.getElementById('ofDepositor').value = '';
   closeCart();
-  document.getElementById('orderModalOverlay').classList.add('show');
+  closeAddedModal();
+  const overlay = document.getElementById('orderModalOverlay');
+  overlay.classList.add('show');
+  const box = overlay.querySelector('.modal-box');
+  if(box) box.scrollTop = 0;
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
 }
 function closeOrderModal(){ document.getElementById('orderModalOverlay').classList.remove('show'); }
+
+function orderQtyChange(id, delta){
+  changeCartQty(id, delta);
+  if(Object.keys(cart).length===0){ closeOrderModal(); renderCartUI(); return; }
+  renderOrderSummary();
+  document.getElementById('orderTotal').textContent = fmt(cartTotal());
+  renderCartUI();
+}
 
 function renderOrderSummary(){
   const items = Object.values(cart);
   document.getElementById('orderSummary').innerHTML = `
     <table class="order-items-table">
       <tr><th>품번 · 품명</th><th>수량</th><th>금액</th></tr>
-      ${items.map(i=>`<tr><td>${i.model} · ${i.name}</td><td>${i.qty}</td><td>${fmt(i.emp*i.qty)}</td></tr>`).join('')}
+      ${items.map(i=>`
+        <tr>
+          <td>${i.model} · ${i.name}</td>
+          <td>
+            <div class="mini-stepper">
+              <button onclick="orderQtyChange('${i.id}',-1)">–</button>
+              <span>${i.qty}</span>
+              <button onclick="orderQtyChange('${i.id}',1)">+</button>
+            </div>
+          </td>
+          <td>${fmt(i.emp*i.qty)}</td>
+        </tr>`).join('')}
     </table>`;
 }
 
@@ -907,9 +979,12 @@ function submitOrder(){
   const dept = document.getElementById('ofDept').value.trim();
   const name = document.getElementById('ofName').value.trim();
   const phone = document.getElementById('ofPhone').value.trim();
+  const recvName = document.getElementById('ofRecvName').value.trim();
+  const recvPhone = document.getElementById('ofRecvPhone').value.trim();
   const addrBase = document.getElementById('ofAddrBase').value.trim();
   const addrDetail = document.getElementById('ofAddrDetail').value.trim();
   if(!dept||!name||!phone||!addrBase){ alert('필수 항목을 모두 입력해주세요. (주소는 검색 버튼으로 입력)'); return; }
+  if(!recvName||!recvPhone){ alert('수령인 정보를 입력해주세요.'); return; }
   if(!addrDetail){ alert('상세주소를 입력해주세요.'); return; }
 
   if(payMethod==='계좌이체'){
