@@ -329,6 +329,33 @@
   }
   .site-footer .sep{ color:var(--border); }
 
+  .order-modal{ max-width:640px; }
+  table.order-items-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.order-items-table th, table.order-items-table td{ padding:8px 6px; border-bottom:1px solid var(--border); text-align:left; }
+  table.order-items-table th{ color:var(--muted); font-weight:600; font-size:11.5px; }
+
+  .order-form{ display:flex; flex-direction:column; gap:14px; margin:18px 0; }
+  .field-row label{ display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:5px; }
+  .field-row input{ width:100%; height:38px; border:1px solid var(--border); border-radius:8px; padding:0 12px; font-size:13.5px; outline:none; background:#fff; color:var(--ink); }
+  .field-row input:focus{ border-color:var(--brand); }
+  .field-row input:disabled{ background:var(--bg); color:var(--muted); }
+  .field-row.two{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .field-row .req{ color:#B4402A; font-weight:600; }
+
+  .chk-row{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); cursor:pointer; }
+
+  .pay-toggle{ display:flex; gap:8px; }
+  .pay-btn{ flex:1; padding:10px; border:1.5px solid var(--border); border-radius:8px; background:#fff; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; }
+  .pay-btn.active{ border-color:var(--brand); background:var(--brand); color:#fff; }
+
+  .order-total-row{ display:flex; justify-content:space-between; align-items:center; padding-top:14px; border-top:1px solid var(--border); font-size:14px; }
+  .order-total-row b{ font-size:19px; color:var(--gold); }
+
+  .order-actions{ display:flex; gap:10px; margin-top:18px; }
+  .order-actions button{ margin-top:0; }
+  .order-actions .cancel-btn{ flex:1; background:#fff; color:var(--ink); border:1.5px solid var(--border); border-radius:8px; height:46px; font-size:13.5px; font-weight:600; cursor:pointer; }
+  .submit-order-btn{ flex:2; background:var(--brand); color:#fff; border:none; border-radius:8px; height:46px; font-size:14.5px; font-weight:700; cursor:pointer; }
+
   .mock-note{ text-align:center; color:var(--muted); font-size:11.5px; margin-top:50px; padding-top:16px; border-top:1px dashed var(--border); }
 </style>
 </head>
@@ -390,9 +417,52 @@
   <div class="drawer-items" id="drawerItems"></div>
   <div class="drawer-foot">
     <div class="total-row"><span>합계</span><b id="drawerTotal">0원</b></div>
-    <button class="checkout-btn" onclick="alert('주문 폼 화면은 다음 단계에서 구현 예정입니다.')">주문하기</button>
+    <button class="checkout-btn" onclick="openOrderModal()">주문하기</button>
   </div>
 </aside>
+
+<!-- 주문서 모달 -->
+<div class="modal-overlay" id="orderModalOverlay" onclick="if(event.target===this)closeOrderModal()">
+  <div class="modal-box order-modal">
+    <h3>직원구매 주문서</h3>
+    <div id="orderSummary"></div>
+    <div class="order-form">
+      <div class="field-row">
+        <label>소속부서</label>
+        <input id="ofDept" type="text" placeholder="예: 영업지원팀">
+      </div>
+      <div class="field-row two">
+        <div><label>주문자명</label><input id="ofName" type="text" oninput="syncRecipient()"></div>
+        <div><label>주문자 연락처</label><input id="ofPhone" type="text" placeholder="010-0000-0000" oninput="syncRecipient()"></div>
+      </div>
+      <label class="chk-row"><input type="checkbox" id="ofSameRecipient" checked onchange="syncRecipient()"> 수령인 정보 주문자와 동일</label>
+      <div class="field-row two">
+        <div><label>수령인</label><input id="ofRecvName" type="text" disabled></div>
+        <div><label>수령인 연락처</label><input id="ofRecvPhone" type="text" placeholder="010-0000-0000" disabled></div>
+      </div>
+      <div class="field-row">
+        <label>배송주소</label>
+        <input id="ofAddr" type="text" placeholder="도로명 주소 + 상세주소">
+      </div>
+      <div class="field-row">
+        <label>결제수단</label>
+        <div class="pay-toggle">
+          <button type="button" class="pay-btn active" data-pay="계좌이체" onclick="setPayMethod('계좌이체')">계좌이체</button>
+          <button type="button" class="pay-btn" data-pay="카드결제" onclick="setPayMethod('카드결제')">카드결제</button>
+        </div>
+      </div>
+      <div class="field-row" id="depositorRow">
+        <label>입금자명 <span class="req">(필수)</span></label>
+        <input id="ofDepositor" type="text" placeholder="입금하실 분 성함">
+      </div>
+    </div>
+    <div class="order-total-row"><span>총 결제금액</span><b id="orderTotal">0원</b></div>
+    <div class="order-actions">
+      <button class="cancel-btn" onclick="closeOrderModal()">취소</button>
+      <button class="submit-order-btn" onclick="submitOrder()">발주하기</button>
+    </div>
+  </div>
+</div>
 
 <!-- 플로팅 버튼: 장바구니 + 채팅 -->
 <div class="fab-stack" id="fabStack">
@@ -710,6 +780,60 @@ function openCompareModal(){
   document.getElementById('compareModalOverlay').classList.add('show');
 }
 function closeCompareModal(){ document.getElementById('compareModalOverlay').classList.remove('show'); }
+
+/* ---------- 주문서 ---------- */
+let payMethod = '계좌이체';
+
+function openOrderModal(){
+  if(Object.keys(cart).length===0){ alert('장바구니가 비어있습니다.'); return; }
+  renderOrderSummary();
+  document.getElementById('orderTotal').textContent = fmt(cartTotal());
+  payMethod = '계좌이체';
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active', b.dataset.pay==='계좌이체'));
+  document.getElementById('depositorRow').style.display = 'block';
+  closeCart();
+  document.getElementById('orderModalOverlay').classList.add('show');
+}
+function closeOrderModal(){ document.getElementById('orderModalOverlay').classList.remove('show'); }
+
+function renderOrderSummary(){
+  const items = Object.values(cart);
+  document.getElementById('orderSummary').innerHTML = `
+    <table class="order-items-table">
+      <tr><th>품번 · 품명</th><th>수량</th><th>금액</th></tr>
+      ${items.map(i=>`<tr><td>${i.model} · ${i.name}</td><td>${i.qty}</td><td>${fmt(i.emp*i.qty)}</td></tr>`).join('')}
+    </table>`;
+}
+
+function setPayMethod(m){
+  payMethod = m;
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active', b.dataset.pay===m));
+  document.getElementById('depositorRow').style.display = m==='계좌이체' ? 'block' : 'none';
+}
+
+function syncRecipient(){
+  const same = document.getElementById('ofSameRecipient').checked;
+  const rn = document.getElementById('ofRecvName'), rp = document.getElementById('ofRecvPhone');
+  rn.disabled = same; rp.disabled = same;
+  if(same){
+    rn.value = document.getElementById('ofName').value;
+    rp.value = document.getElementById('ofPhone').value;
+  }
+}
+
+function submitOrder(){
+  const dept = document.getElementById('ofDept').value.trim();
+  const name = document.getElementById('ofName').value.trim();
+  const phone = document.getElementById('ofPhone').value.trim();
+  const addr = document.getElementById('ofAddr').value.trim();
+  if(!dept||!name||!phone||!addr){ alert('필수 항목을 모두 입력해주세요.'); return; }
+  if(payMethod==='계좌이체' && !document.getElementById('ofDepositor').value.trim()){
+    alert('계좌이체 선택 시 입금자명은 필수입니다.'); return;
+  }
+  alert('주문이 접수되었습니다.\n\n(실제 연동 시 이 시점에 구글시트 기록 + 영업지원팀 구글챗 알림이 자동 발송됩니다)');
+  cart = {}; saveCart(cart); renderCartUI();
+  closeOrderModal();
+}
 
 /* ---------- 대시보드 더미 데이터 ---------- */
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
