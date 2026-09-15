@@ -346,8 +346,19 @@
   .chk-row{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); cursor:pointer; }
 
   .pay-toggle{ display:flex; gap:8px; }
-  .pay-btn{ flex:1; padding:10px; border:1.5px solid var(--border); border-radius:8px; background:#fff; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; }
-  .pay-btn.active{ border-color:var(--brand); background:var(--brand); color:#fff; }
+  .pay-toggle.small{ gap:6px; }
+  .pay-btn, .paid-btn{
+    flex:1; padding:10px; border:1.5px solid var(--border); border-radius:8px; background:#fff;
+    font-size:13px; font-weight:600; color:var(--muted); cursor:pointer;
+  }
+  .pay-toggle.small .paid-btn{ padding:8px 6px; font-size:12px; height:38px; }
+  .pay-btn.active, .paid-btn.active{ border-color:var(--brand); background:var(--brand); color:#fff; }
+
+  .notice-box{
+    background:var(--gold-bg); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; font-size:13px; color:var(--ink); line-height:1.5;
+  }
+  .notice-box b{ color:var(--brand); }
 
   .order-total-row{ display:flex; justify-content:space-between; align-items:center; padding-top:14px; border-top:1px solid var(--border); font-size:14px; }
   .order-total-row b{ font-size:19px; color:var(--gold); }
@@ -398,7 +409,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V2.0</span>
+    <span class="ver">V2.3</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -461,14 +472,36 @@
       </div>
       <div class="field-row">
         <label>결제수단</label>
-        <div class="pay-toggle">
+        <div class="pay-toggle" id="payMethodToggle">
           <button type="button" class="pay-btn active" data-pay="계좌이체" onclick="setPayMethod('계좌이체')">계좌이체</button>
           <button type="button" class="pay-btn" data-pay="카드결제" onclick="setPayMethod('카드결제')">카드결제</button>
         </div>
       </div>
-      <div class="field-row" id="depositorRow">
-        <label>입금자명 <span class="req">(필수)</span></label>
-        <input id="ofDepositor" type="text" placeholder="입금하실 분 성함">
+
+      <div id="bankFields">
+        <div class="field-row two">
+          <div>
+            <label>입금자명 <span class="req">(필수)</span></label>
+            <input id="ofDepositor" type="text" placeholder="입금하실 분 성함">
+          </div>
+          <div>
+            <label>입금여부 확인 <span class="req">(필수)</span></label>
+            <div class="pay-toggle small">
+              <button type="button" class="paid-btn" data-paid="Y" onclick="setPaidStatus('Y')">입금완료</button>
+              <button type="button" class="paid-btn" data-paid="N" onclick="setPaidStatus('N')">미입금</button>
+            </div>
+          </div>
+        </div>
+        <label class="chk-row" style="margin-top:14px;">
+          <input type="checkbox" id="ofCashReceipt" onchange="toggleCashReceipt()"> 현금영수증 발행
+        </label>
+        <div class="field-row" id="cashReceiptRow" style="display:none; margin-top:8px;">
+          <input id="ofCashReceiptNo" type="text" placeholder="발행번호 (휴대폰번호 또는 사업자번호)">
+        </div>
+      </div>
+
+      <div class="field-row" id="cardNotice" style="display:none;">
+        <div class="notice-box">카드결제는 영업지원팀 <b>문경현 대리</b>에게 직접 결제 바랍니다.</div>
       </div>
     </div>
     <div class="order-total-row"><span>총 결제금액</span><b id="orderTotal">0원</b></div>
@@ -487,7 +520,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V2.0';
+const APP_VERSION = 'V2.3';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -798,6 +831,7 @@ function closeCompareModal(){ document.getElementById('compareModalOverlay').cla
 
 /* ---------- 주문서 ---------- */
 let payMethod = '계좌이체';
+let paidStatus = null;
 
 function execDaumPostcode(){
   if(typeof daum === 'undefined' || !daum.Postcode){
@@ -819,8 +853,15 @@ function openOrderModal(){
   renderOrderSummary();
   document.getElementById('orderTotal').textContent = fmt(cartTotal());
   payMethod = '계좌이체';
-  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active', b.dataset.pay==='계좌이체'));
-  document.getElementById('depositorRow').style.display = 'block';
+  paidStatus = null;
+  document.querySelectorAll('#payMethodToggle .pay-btn').forEach(b=>b.classList.toggle('active', b.dataset.pay==='계좌이체'));
+  document.querySelectorAll('#bankFields .paid-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bankFields').style.display = 'block';
+  document.getElementById('cardNotice').style.display = 'none';
+  document.getElementById('ofCashReceipt').checked = false;
+  document.getElementById('cashReceiptRow').style.display = 'none';
+  document.getElementById('ofCashReceiptNo').value = '';
+  document.getElementById('ofDepositor').value = '';
   closeCart();
   document.getElementById('orderModalOverlay').classList.add('show');
 }
@@ -837,8 +878,19 @@ function renderOrderSummary(){
 
 function setPayMethod(m){
   payMethod = m;
-  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active', b.dataset.pay===m));
-  document.getElementById('depositorRow').style.display = m==='계좌이체' ? 'block' : 'none';
+  document.querySelectorAll('#payMethodToggle .pay-btn').forEach(b=>b.classList.toggle('active', b.dataset.pay===m));
+  document.getElementById('bankFields').style.display = m==='계좌이체' ? 'block' : 'none';
+  document.getElementById('cardNotice').style.display = m==='카드결제' ? 'block' : 'none';
+}
+
+function setPaidStatus(v){
+  paidStatus = v;
+  document.querySelectorAll('#bankFields .paid-btn').forEach(b=>b.classList.toggle('active', b.dataset.paid===v));
+}
+
+function toggleCashReceipt(){
+  const on = document.getElementById('ofCashReceipt').checked;
+  document.getElementById('cashReceiptRow').style.display = on ? 'block' : 'none';
 }
 
 function syncRecipient(){
@@ -859,9 +911,15 @@ function submitOrder(){
   const addrDetail = document.getElementById('ofAddrDetail').value.trim();
   if(!dept||!name||!phone||!addrBase){ alert('필수 항목을 모두 입력해주세요. (주소는 검색 버튼으로 입력)'); return; }
   if(!addrDetail){ alert('상세주소를 입력해주세요.'); return; }
-  if(payMethod==='계좌이체' && !document.getElementById('ofDepositor').value.trim()){
-    alert('계좌이체 선택 시 입금자명은 필수입니다.'); return;
+
+  if(payMethod==='계좌이체'){
+    if(!document.getElementById('ofDepositor').value.trim()){ alert('계좌이체 선택 시 입금자명은 필수입니다.'); return; }
+    if(!paidStatus){ alert('입금여부(입금완료 / 미입금)를 선택해주세요.'); return; }
+    if(document.getElementById('ofCashReceipt').checked && !document.getElementById('ofCashReceiptNo').value.trim()){
+      alert('현금영수증 발행번호를 입력해주세요.'); return;
+    }
   }
+
   alert('주문이 접수되었습니다.\n\n(실제 연동 시 이 시점에 구글시트 기록 + 영업지원팀 구글챗 알림이 자동 발송됩니다)');
   cart = {}; saveCart(cart); renderCartUI();
   closeOrderModal();
