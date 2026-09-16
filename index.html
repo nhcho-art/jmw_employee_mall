@@ -19,6 +19,8 @@
     --gold:#B8862E;
     --gold-bg:#FBF3E3;
     --maxw:1320px;
+    --cmp-win-bg:#E3F5F1; --cmp-win-text:#0F7A6C;
+    --cmp-diff-bg:#FBEEE0; --cmp-diff-text:#B5651D;
   }
   html{ scrollbar-gutter:stable; overflow-y:scroll; }
   *{box-sizing:border-box;}
@@ -147,14 +149,6 @@
   .badge-row{ position:absolute; top:8px; left:8px; display:flex; gap:4px; }
   .badge{ font-size:10.5px; font-weight:700; padding:3px 7px; border-radius:4px; background:rgba(255,255,255,.92); color:var(--ink); }
 
-  .cmp-box{
-    position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:5px;
-    background:rgba(255,255,255,.92); border:1px solid rgba(0,0,0,.15);
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    font-size:12px; color:transparent; font-weight:700;
-  }
-  .cmp-box.checked{ background:var(--brand); border-color:var(--brand); color:#fff; }
-
   .card-body{ padding:12px 14px 14px; display:flex; flex-direction:column; gap:8px; flex:1; }
   .model-code{ font-size:11px; color:var(--muted); }
   .name{ font-size:14px; font-weight:600; line-height:1.35; min-height:38px; }
@@ -229,20 +223,43 @@
   .modal-overlay.show{ display:flex; }
   .modal-box{ background:var(--surface); border-radius:12px; max-width:760px; width:100%; max-height:80vh; overflow:auto; padding:24px; }
   .modal-box.compare-box{ max-width:calc(var(--maxw) + 80px); }
-  .modal-box h3{ margin:0 0 16px; font-size:17px; }
+  .cmp-legend{ font-size:12px; color:var(--muted); margin-bottom:14px; line-height:1.5; }
+  .cmp-legend .win-dot,.cmp-legend .diff-dot{ display:inline-block; width:9px; height:9px; border-radius:50%; margin:0 3px -1px 0; }
+  .cmp-legend .win-dot{ background:var(--cmp-win-text); }
+  .cmp-legend .diff-dot{ background:var(--cmp-diff-text); }
+
   table.cmp-table{ width:100%; table-layout:fixed; border-collapse:collapse; font-size:13px; }
   table.cmp-table th, table.cmp-table td{
     border-bottom:1px solid var(--border); padding:10px 12px; text-align:left; border-left:1px solid var(--border);
+    white-space:normal; word-break:break-word;
   }
   table.cmp-table th:first-child, table.cmp-table td:first-child{
     border-left:none; width:150px; white-space:nowrap; color:var(--muted); font-weight:600; font-size:12px;
   }
-  table.cmp-table th{ color:var(--muted); font-weight:600; font-size:12px; }
-  table.cmp-table td:not(:first-child), table.cmp-table th:not(:first-child){
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
-    overflow:hidden; text-overflow:ellipsis; word-break:break-word;
+  table.cmp-table th{ color:var(--muted); font-weight:600; font-size:12px; vertical-align:top; }
+  table.cmp-table td.spec-win{ background:var(--cmp-win-bg); color:var(--cmp-win-text); font-weight:700; }
+  table.cmp-table td.spec-win::before{ content:'▲ '; }
+  table.cmp-table td.spec-diff{ background:var(--cmp-diff-bg); color:var(--cmp-diff-text); font-weight:600; }
+
+  .cmp-thumb{ width:100%; aspect-ratio:1/1; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; margin-bottom:8px; }
+  .cmp-remove{ display:block; width:100%; margin-top:10px; background:none; border:1px solid var(--border); color:#B4402A; font-size:11px; padding:5px 0; border-radius:6px; cursor:pointer; }
+  .cmp-remove:hover{ background:#FBEAEA; }
+
+  .cmp-insights{ margin-top:28px; }
+  .cmp-insights h4{ font-size:14px; margin:0 0 4px; }
+  .cmp-insights .sub{ font-size:12px; color:var(--muted); margin-bottom:14px; }
+  .insight-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(0,1fr)); gap:14px; }
+  .insight-card{ background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .insight-card b{ display:block; font-size:12.5px; margin-bottom:8px; }
+  .insight-card ul{ margin:0; padding-left:16px; font-size:12px; color:var(--ink); line-height:1.6; }
+
+  .cmp-box{
+    position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:5px;
+    background:rgba(255,255,255,.92); border:1px solid rgba(0,0,0,.15);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    font-size:12px; color:transparent; font-weight:700;
   }
-  table.cmp-table td.spec-best{ background:var(--gold-bg); font-weight:700; color:var(--brand); }
+  .cmp-box.checked{ background:var(--brand); border-color:var(--brand); color:#fff; }
   .modal-close{ margin-top:16px; background:var(--ink); color:#fff; border:none; border-radius:8px; padding:10px 18px; font-size:13px; cursor:pointer; }
 
   /* ---- Floating action stack (cart + chat) ---- */
@@ -437,7 +454,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V3.2</span>
+    <span class="ver">V3.3</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -454,7 +471,9 @@
 <div class="modal-overlay" id="compareModalOverlay" onclick="if(event.target===this)closeCompareModal()">
   <div class="modal-box compare-box">
     <h3>제품 비교</h3>
+    <div class="cmp-legend"><span class="win-dot"></span>는 해당 항목에서 더 좋은 값(가벼움·긴 코드·높은 출력 등, 방향에 맞게 자동 판단)을 의미하며, <span class="diff-dot"></span>그 외 값이 다른 항목은 강조 표시됩니다.</div>
     <table class="cmp-table" id="compareTable"></table>
+    <div class="cmp-insights" id="compareInsights"></div>
     <button class="modal-close" onclick="closeCompareModal()">닫기</button>
   </div>
 </div>
@@ -559,7 +578,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V3.2';
+const APP_VERSION = 'V3.3';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -686,21 +705,22 @@ const PRODUCTS = [
   { id:'p97', cat:"life", model:"JBD1900A", name:"바디 드라이어 벨린", emp:133000, released:"2025.08", specs:{"와트":"1900W", "제어방식/안전장치":"NTC 온도제어 / 과열 방지, 온도·전압·전류 보호 시스템", "사이즈":"480x450x170mm", "무게":"5.5kg / (최대하중230kg)", "코드길이":"1.8m", "색상":"베이지&그레이", "온도범위":"28-45도", "기능":"적외선 센서 사용자 감지 / 음이온케어(700만개) / 예열기능 / 메모리기능"} },
   { id:'p98', cat:"life", model:"CLS5A01A", name:"에어뮤즈 대형", emp:81000, released:"2024.05", specs:{"와트":"36W", "사이즈":"250x250x970mm", "무게":"3.41kg", "코드길이":"1.5m", "색상":"화이트&로즈골드", "온도범위":"-", "기능":"20단 풍속 / 자연풍 / 수면풍 / 120도 회전", "풍속":"20단"} },
   { id:'p99', cat:"life", model:"FA01A", name:"바이툴즈 음식물처리기", emp:225000, released:"26년 8월", specs:{"타입":"분쇄건조방식", "소비전력":"500W", "용량":"2.7L", "제품사이즈":"180 x 345 x 319(mm)", "제품무게":"8 (kg)", "박스사이즈":"261 x 408 x 380(mm)", "박스무게":"9.3 (kg)", "코드길이":"1.5M", "색상":"스톤베이지 / (Stone Beige)", "온도범위":"최대 온도 / 150℃", "기능":"1. 감량율 95% / 2. 최소 건조 시간 1시간 9분 / 3. 3종 함침 활성탄 필터(800g) / 4. 살균 99.999% / 5. 자동 온습도 센싱 / 6. 멜로디 탑재", "비고":"상세 사양 / 링크"} },
-  { id:'p100', cat:"haircare", model:"HC01", name:"로아띠 헤어오일 80ml", emp:5200, released:null, specs:null },
-  { id:'p101', cat:"haircare", model:"HC02", name:"로아띠 컬크림 160ml", emp:3800, released:null, specs:null },
-  { id:'p102', cat:"haircare", model:"HC03", name:"로아띠 크림미스트 200ml", emp:4000, released:null, specs:null },
-  { id:'p103', cat:"haircare", model:"HC04", name:"로아띠 피토레스트 480ml", emp:5100, released:null, specs:null },
-  { id:'p104', cat:"haircare", model:"HC05", name:"로아띠 이너리페어 본딩 트리트먼트 250ml", emp:4500, released:null, specs:null },
-  { id:'p105', cat:"haircare", model:"HC06", name:"온리치 2S 샴푸", emp:5000, released:null, specs:null },
-  { id:'p106', cat:"haircare", model:"HC07", name:"온리치 2S 트리트먼트", emp:5000, released:null, specs:null },
-  { id:'p107', cat:"haircare", model:"HC08", name:"온클린 컨디셔너", emp:4700, released:null, specs:null },
-  { id:'p108', cat:"haircare", model:"HC09", name:"실크웨어 오일", emp:6800, released:null, specs:null },
-  { id:'p109', cat:"haircare", model:"HC10", name:"얼티밋 바운시 컬크림", emp:2600, released:null, specs:null },
-  { id:'p110', cat:"haircare", model:"HC11", name:"에어리샤워 미스트", emp:5800, released:null, specs:null },
-  { id:'p111', cat:"haircare", model:"HC12", name:"모로운 (퓨리파잉/너리싱) 샴푸 본품 750ml", emp:9100, released:null, specs:null },
-  { id:'p112', cat:"haircare", model:"HC13", name:"모로운 (퓨리파잉/너리싱) 샴푸 미니어처 50ml", emp:1200, released:null, specs:null },
-  { id:'p113', cat:"haircare", model:"HC14", name:"플렉서블 더블본딩 클리닉 본품 1,000g", emp:12000, released:null, specs:null },
-  { id:'p114', cat:"haircare", model:"HC15", name:"플렉서블 더블본딩 클리닉 미니어처 250g", emp:4000, released:null, specs:null },
+  { id:'p100', cat:"haircare", model:"CMCA12-0001", name:"로아띠 헤어오일 80ml", emp:5200, released:null, specs:null },
+  { id:'p101', cat:"haircare", model:"CMCA13-0001", name:"로아띠 컬크림 160ml", emp:3800, released:null, specs:null },
+  { id:'p102', cat:"haircare", model:"CMCA14-0001", name:"로아띠 크림미스트 200ml", emp:4000, released:null, specs:null },
+  { id:'p103', cat:"haircare", model:"CMCA15-0001", name:"로아띠 피토레스트 480ml", emp:5100, released:null, specs:null },
+  { id:'p104', cat:"haircare", model:"CMCA16-0001", name:"로아띠 이너리페어 본딩 트리트먼트 250ml", emp:4500, released:null, specs:null },
+  { id:'p105', cat:"haircare", model:"CCL01-0007", name:"온리치 2S 샴푸", emp:5000, released:null, specs:null },
+  { id:'p106', cat:"haircare", model:"CCL01-0006", name:"온리치 2S 트리트먼트", emp:5000, released:null, specs:null },
+  { id:'p107', cat:"haircare", model:"CCL01-0004", name:"온클린 컨디셔너", emp:4700, released:null, specs:null },
+  { id:'p108', cat:"haircare", model:"CCA04-0001", name:"실크웨어 오일", emp:6800, released:null, specs:null },
+  { id:'p109', cat:"haircare", model:"CST03-0001", name:"얼티밋 바운시 컬크림", emp:2600, released:null, specs:null },
+  { id:'p110', cat:"haircare", model:"CCA06-0001", name:"에어리샤워 미스트", emp:5800, released:null, specs:null },
+  { id:'p111', cat:"haircare", model:"CCA07-0001", name:"모로운 (퓨리파잉) 샴푸 본품 750ml", emp:9100, released:null, specs:null },
+  { id:'p111b', cat:"haircare", model:"CCA07-0002", name:"모로운 (너리싱) 샴푸 본품 750ml", emp:null, released:null, specs:null },
+  { id:'p112', cat:"haircare", model:"CCA07-0005", name:"모로운 (퓨리파잉/너리싱) 샴푸 미니어처 50ml", emp:1200, released:null, specs:null },
+  { id:'p113', cat:"haircare", model:"CCA08-0001", name:"플렉서블 더블본딩 클리닉 본품 1,000g", emp:12000, released:null, specs:null },
+  { id:'p114', cat:"haircare", model:"CCA08-0002", name:"플렉서블 더블본딩 클리닉 미니어처 250g", emp:4000, released:null, specs:null },
   { id:'p115', cat:"acc", model:"MS70-DIF", name:"MS70 디퓨저", emp:9500, released:null, specs:null },
   { id:'p116', cat:"acc", model:"STAND-01", name:"거치대", emp:5000, released:null, specs:null },
   { id:'p117', cat:"styler", model:"HCS7001A", name:"클리퍼기(바리깡) HCS7001A", emp:86000, released:null, specs:null },
@@ -753,26 +773,27 @@ function productCard(p){
   const idx = PRODUCTS.indexOf(p);
   const qty = cart[p.id]?.qty || 0;
   const checked = compareSet.has(p.id);
+  const noPrice = p.emp===null || p.emp===undefined;
   return `
   <div class="card" onclick="viewSingleProduct('${p.id}')">
     <div class="thumb" style="background:${colorFor(idx)}">
       <div class="badge-row">${p.best?'<span class="badge">BEST</span>':''}</div>
-      <div class="cmp-box ${checked?'checked':''}" onclick="event.stopPropagation(); toggleCompare('${p.id}', this)">✓</div>
+      <div class="cmp-box ${checked?'checked':''}" data-id="${p.id}" onclick="event.stopPropagation(); toggleCompare('${p.id}', this)">✓</div>
       ${p.model}
     </div>
     <div class="card-body">
       <div class="model-code">품번 ${p.model}${p.released?` · 출시 ${p.released}`:''}</div>
       <div class="name">${p.name}</div>
       <div class="price-row">
-        <span class="emp-price">${p.emp.toLocaleString('ko-KR')}</span><span class="won">원</span>
+        ${noPrice ? `<span style="color:var(--muted);font-size:13px;">가격 확인중</span>` : `<span class="emp-price">${p.emp.toLocaleString('ko-KR')}</span><span class="won">원</span>`}
       </div>
       <div class="qty-row">
         <div class="stepper">
-          <button onclick="event.stopPropagation(); stepQty('${p.id}',-1)">–</button>
+          <button onclick="event.stopPropagation(); stepQty('${p.id}',-1)" ${noPrice?'disabled':''}>–</button>
           <span id="qty-${p.id}">${qty}</span>
-          <button onclick="event.stopPropagation(); stepQty('${p.id}',1)">+</button>
+          <button onclick="event.stopPropagation(); stepQty('${p.id}',1)" ${noPrice?'disabled':''}>+</button>
         </div>
-        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">담기</button>
+        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')" ${noPrice?'disabled style="opacity:.5;cursor:not-allowed;"':''}>담기</button>
       </div>
     </div>
   </div>`;
@@ -836,6 +857,7 @@ function stepQty(id, delta){
 }
 function addToCart(id){
   const p = PRODUCTS.find(p=>p.id===id);
+  if(p.emp===null || p.emp===undefined){ alert('아직 가격이 확정되지 않은 상품입니다.'); return; }
   const qty = pendingQty[id] ?? (cart[id]?.qty||0);
   const finalQty = qty>0 ? qty : 1;
   cart[id] = { ...p, qty: finalQty };
@@ -908,6 +930,7 @@ function toggleCompare(id, el){
     compareSet.add(id); el.classList.add('checked');
   }
   renderCompareBar();
+  if(compareSet.size>0) openCompareModal(); else closeCompareModal();
 }
 function renderCompareBar(){
   const bar = document.getElementById('compareBar');
@@ -925,6 +948,7 @@ function clearCompare(){
   compareSet.clear();
   document.querySelectorAll('.cmp-box.checked').forEach(el=>el.classList.remove('checked'));
   renderCompareBar();
+  closeCompareModal();
 }
 
 // 무게처럼 작을수록 좋은 항목. 그 외 숫자 항목은 클수록 좋은 것으로 간주.
@@ -939,12 +963,51 @@ function parseSpecNumber(key, str){
   return isNaN(v) ? null : v;
 }
 
+const SPEC_PHRASE = {
+  '무게': v=>`가장 가벼워 손목에 부담이 적습니다 (${v})`,
+  '코드길이': v=>`코드가 가장 길어 콘센트에서 멀리 떨어져도 여유롭게 사용할 수 있습니다 (${v})`,
+  '와트': v=>`출력이 가장 높습니다 (${v})`,
+  '풍속': v=>`바람 세기가 가장 강합니다 (${v})`,
+};
+function insightBullets(p, items){
+  const bullets = [];
+  if(p.specs && p.specs['기능']){
+    p.specs['기능'].split('/').map(s=>s.trim()).filter(Boolean).forEach(f=>bullets.push(f+'를 지원합니다.'));
+  }
+  if(items.length>1 && p.specs){
+    Object.keys(p.specs).forEach(k=>{
+      if(k==='기능') return;
+      const nums = items.map(x=> x.specs ? parseSpecNumber(k, x.specs[k]) : null);
+      if(nums.every(n=>n!==null) && new Set(nums).size>1){
+        const best = LOWER_IS_BETTER.has(k) ? Math.min(...nums) : Math.max(...nums);
+        const myVal = parseSpecNumber(k, p.specs[k]);
+        if(myVal===best){
+          const phrase = SPEC_PHRASE[k] ? SPEC_PHRASE[k](p.specs[k]) : `${k} 항목에서 가장 우수합니다 (${p.specs[k]})`;
+          bullets.push(phrase);
+        }
+      }
+    });
+  }
+  if(bullets.length===0) bullets.push('등록된 사양 특징 정보가 없습니다.');
+  return bullets;
+}
+
 function viewSingleProduct(id){ openCompareModal([id]); }
+
+function removeFromCompareOrClose(id){
+  if(compareSet.has(id)){
+    compareSet.delete(id);
+    document.querySelectorAll(`.cmp-box[data-id="${id}"]`).forEach(el=>el.classList.remove('checked'));
+    renderCompareBar();
+    if(compareSet.size>0){ openCompareModal(); return; }
+  }
+  closeCompareModal();
+}
 
 function openCompareModal(idsOverride){
   const ids = idsOverride || [...compareSet];
   const items = PRODUCTS.filter(p=>ids.includes(p.id));
-  if(items.length===0) return;
+  if(items.length===0){ closeCompareModal(); return; }
 
   const specKeySet = new Set();
   items.forEach(p=>{ if(p.specs) Object.keys(p.specs).forEach(k=>specKeySet.add(k)); });
@@ -953,28 +1016,32 @@ function openCompareModal(idsOverride){
   const headerCells = items.map(p=>{
     const idx = PRODUCTS.indexOf(p);
     return `<th>
-      <div style="width:44px;height:44px;border-radius:6px;background:${colorFor(idx)};display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;margin-bottom:6px;">${p.model}</div>
+      <div class="cmp-thumb" style="background:${colorFor(idx)}">${p.model}</div>
       ${p.name}<br><span style="font-weight:400;color:var(--muted);">품번 ${p.model}${p.released?' · '+p.released:''}</span>
+      <button class="cmp-remove" onclick="removeFromCompareOrClose('${p.id}')">✕ 비교에서 제외</button>
     </th>`;
   }).join('');
 
   const priceRow = `<tr><td><b>직원가</b></td>${items.map(p=>`<td style="color:var(--gold);font-weight:700;">${fmt(p.emp)}</td>`).join('')}</tr>`;
 
   const specRows = specKeys.length ? specKeys.map(k=>{
-    // 여러 개 비교 중이고, 전 제품이 해당 값을 숫자로 갖고 있을 때만 우위 하이라이트 계산
-    let bestVal = null;
-    if(items.length>1){
+    let winVal = null;
+    const rawVals = items.map(p=> (p.specs && p.specs[k]) || null);
+    const allDiffer = new Set(rawVals).size > 1;
+    if(items.length>1 && allDiffer){
       const nums = items.map(p=> p.specs ? parseSpecNumber(k, p.specs[k]) : null);
       if(nums.every(n=>n!==null) && new Set(nums).size>1){
-        bestVal = LOWER_IS_BETTER.has(k) ? Math.min(...nums) : Math.max(...nums);
+        winVal = LOWER_IS_BETTER.has(k) ? Math.min(...nums) : Math.max(...nums);
       }
     }
     const cells = items.map(p=>{
       const raw = (p.specs && p.specs[k]) || '-';
       let cls = '';
-      if(bestVal!==null){
+      if(winVal!==null){
         const n = parseSpecNumber(k, p.specs[k]);
-        if(n===bestVal) cls=' class="spec-best"';
+        cls = n===winVal ? ' class="spec-win"' : '';
+      } else if(allDiffer && raw!=='-'){
+        cls = ' class="spec-diff"';
       }
       return `<td${cls}>${raw}</td>`;
     }).join('');
@@ -985,7 +1052,17 @@ function openCompareModal(idsOverride){
     <tr><th>구분</th>${headerCells}</tr>
     ${priceRow}
     ${specRows}`;
+
+  document.getElementById('compareInsights').innerHTML = items.length>1 ? `
+    <h4>인사이트 &amp; 추천</h4>
+    <div class="sub">각 모델의 사양을 바탕으로 어떤 상황에 더 맞는지 정리했습니다.</div>
+    <div class="insight-grid" style="grid-template-columns:repeat(${items.length},1fr)">
+      ${items.map(p=>`<div class="insight-card"><b>${p.name}</b><ul>${insightBullets(p, items).map(b=>`<li>${b}</li>`).join('')}</ul></div>`).join('')}
+    </div>` : '';
+
   document.getElementById('compareModalOverlay').classList.add('show');
+  const box = document.querySelector('#compareModalOverlay .modal-box');
+  if(box) box.scrollTop = 0;
 }
 function closeCompareModal(){ document.getElementById('compareModalOverlay').classList.remove('show'); }
 
