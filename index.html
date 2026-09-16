@@ -223,6 +223,9 @@
   .modal-overlay.show{ display:flex; }
   .modal-box{ background:var(--surface); border-radius:12px; max-width:760px; width:100%; max-height:80vh; overflow:auto; padding:24px; }
   .modal-box.compare-box{ max-width:calc(var(--maxw) + 80px); }
+  .cmp-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .cmp-head h3{ margin:0; font-size:17px; }
+  .cmp-x{ background:none; border:none; font-size:18px; color:var(--muted); cursor:pointer; line-height:1; padding:4px; }
   .cmp-legend{ font-size:12px; color:var(--muted); margin-bottom:14px; line-height:1.5; }
   .cmp-legend .win-dot,.cmp-legend .diff-dot{ display:inline-block; width:9px; height:9px; border-radius:50%; margin:0 3px -1px 0; }
   .cmp-legend .win-dot{ background:var(--cmp-win-text); }
@@ -241,7 +244,9 @@
   table.cmp-table td.spec-win::before{ content:'▲ '; }
   table.cmp-table td.spec-diff{ background:var(--cmp-diff-bg); color:var(--cmp-diff-text); font-weight:600; }
 
-  .cmp-thumb{ width:100%; aspect-ratio:1/1; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; margin-bottom:8px; }
+  /* 비교 개수와 무관하게 위아래 높이는 고정 — 배경(칼럼 폭)만 좌우로 늘어남 */
+  .cmp-thumb-wrap{ width:100%; height:170px; background:var(--bg); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:8px; overflow:hidden; }
+  .cmp-thumb{ width:120px; height:120px; max-width:80%; max-height:80%; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; flex:none; }
   .cmp-remove{ display:block; width:100%; margin-top:10px; background:none; border:1px solid var(--border); color:#B4402A; font-size:11px; padding:5px 0; border-radius:6px; cursor:pointer; }
   .cmp-remove:hover{ background:#FBEAEA; }
 
@@ -252,6 +257,24 @@
   .insight-card{ background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
   .insight-card b{ display:block; font-size:12.5px; margin-bottom:8px; }
   .insight-card ul{ margin:0; padding-left:16px; font-size:12px; color:var(--ink); line-height:1.6; }
+
+  /* ---- 단일 상품 상세 뷰 ---- */
+  .single-view{ display:flex; gap:28px; }
+  .single-photo{ width:320px; flex:none; height:320px; background:var(--bg); border-radius:12px; display:flex; align-items:center; justify-content:center; }
+  .single-photo .cmp-thumb{ width:200px; height:200px; }
+  .single-info{ flex:1; min-width:0; }
+  .single-crumb{ font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .single-title{ font-size:21px; font-weight:700; margin-bottom:6px; }
+  .single-sub{ font-size:13px; color:var(--muted); margin-bottom:12px; }
+  .single-badges{ display:flex; gap:6px; margin-bottom:18px; }
+  .single-badges span{ font-size:11.5px; padding:4px 10px; border-radius:100px; background:var(--gold-bg); color:var(--brand); font-weight:600; }
+  .single-price{ font-size:22px; font-weight:700; color:var(--gold); margin-bottom:18px; }
+  table.single-spec{ width:100%; border-collapse:collapse; font-size:13px; margin-bottom:20px; }
+  table.single-spec td{ padding:9px 0; border-bottom:1px solid var(--border); }
+  table.single-spec td:first-child{ width:110px; color:var(--muted); font-weight:600; font-size:12px; }
+  .single-add-btn{ background:var(--brand); color:#fff; border:none; border-radius:8px; padding:12px 22px; font-size:13.5px; font-weight:700; cursor:pointer; }
+  .single-add-btn:disabled{ background:var(--muted); cursor:default; }
+  @media (max-width:700px){ .single-view{ flex-direction:column; } .single-photo{ width:100%; } }
 
   .cmp-box{
     position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:5px;
@@ -454,7 +477,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V3.3</span>
+    <span class="ver">V3.4</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -470,10 +493,11 @@
 <!-- 비교 모달 -->
 <div class="modal-overlay" id="compareModalOverlay" onclick="if(event.target===this)closeCompareModal()">
   <div class="modal-box compare-box">
-    <h3>제품 비교</h3>
-    <div class="cmp-legend"><span class="win-dot"></span>는 해당 항목에서 더 좋은 값(가벼움·긴 코드·높은 출력 등, 방향에 맞게 자동 판단)을 의미하며, <span class="diff-dot"></span>그 외 값이 다른 항목은 강조 표시됩니다.</div>
-    <table class="cmp-table" id="compareTable"></table>
-    <div class="cmp-insights" id="compareInsights"></div>
+    <div class="cmp-head">
+      <h3 id="compareTitle">제품 비교</h3>
+      <button class="cmp-x" onclick="closeCompareModal()">✕</button>
+    </div>
+    <div id="compareContent"></div>
     <button class="modal-close" onclick="closeCompareModal()">닫기</button>
   </div>
 </div>
@@ -578,7 +602,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V3.3';
+const APP_VERSION = 'V3.4';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -930,7 +954,6 @@ function toggleCompare(id, el){
     compareSet.add(id); el.classList.add('checked');
   }
   renderCompareBar();
-  if(compareSet.size>0) openCompareModal(); else closeCompareModal();
 }
 function renderCompareBar(){
   const bar = document.getElementById('compareBar');
@@ -1004,61 +1027,105 @@ function removeFromCompareOrClose(id){
   closeCompareModal();
 }
 
+function addToCompareFromSingle(id, btnEl){
+  if(!compareSet.has(id)){
+    if(compareSet.size>=4){ alert('제품 비교는 최대 4개까지 선택할 수 있습니다.'); return; }
+    compareSet.add(id);
+    document.querySelectorAll(`.cmp-box[data-id="${id}"]`).forEach(el=>el.classList.add('checked'));
+    renderCompareBar();
+  }
+  if(btnEl){ btnEl.textContent = '✓ 비교함에 담김'; btnEl.disabled = true; }
+}
+
 function openCompareModal(idsOverride){
   const ids = idsOverride || [...compareSet];
   const items = PRODUCTS.filter(p=>ids.includes(p.id));
   if(items.length===0){ closeCompareModal(); return; }
 
-  const specKeySet = new Set();
-  items.forEach(p=>{ if(p.specs) Object.keys(p.specs).forEach(k=>specKeySet.add(k)); });
-  const specKeys = [...specKeySet];
+  const content = document.getElementById('compareContent');
+  const titleEl = document.getElementById('compareTitle');
 
-  const headerCells = items.map(p=>{
+  if(items.length===1){
+    /* ---------- 단일 상품 정보 뷰 ---------- */
+    const p = items[0];
     const idx = PRODUCTS.indexOf(p);
-    return `<th>
-      <div class="cmp-thumb" style="background:${colorFor(idx)}">${p.model}</div>
-      ${p.name}<br><span style="font-weight:400;color:var(--muted);">품번 ${p.model}${p.released?' · '+p.released:''}</span>
-      <button class="cmp-remove" onclick="removeFromCompareOrClose('${p.id}')">✕ 비교에서 제외</button>
-    </th>`;
-  }).join('');
+    titleEl.textContent = '제품 정보';
+    const catLabel = (CATEGORIES.find(c=>c.key===p.cat)||{}).label || p.cat;
+    const specRows = p.specs ? Object.entries(p.specs).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('') : '';
+    const inCompare = compareSet.has(p.id);
+    content.innerHTML = `
+      <div class="single-view">
+        <div class="single-photo"><div class="cmp-thumb" style="background:${colorFor(idx)}">${p.model}</div></div>
+        <div class="single-info">
+          <div class="single-crumb">${catLabel}</div>
+          <div class="single-title">${p.name}</div>
+          <div class="single-sub">품번 ${p.model}</div>
+          <div class="single-badges">${p.released?`<span>출시 ${p.released}</span>`:''}</div>
+          <div class="single-price">${p.emp!=null ? fmt(p.emp) : '가격 확인중'}</div>
+          ${specRows ? `<table class="single-spec">${specRows}</table>` : `<div style="color:var(--muted);font-size:13px;margin-bottom:18px;">등록된 사양 정보가 없습니다.</div>`}
+          <button class="single-add-btn" ${inCompare?'disabled':''} onclick="addToCompareFromSingle('${p.id}', this)">${inCompare?'✓ 비교함에 담김':'+ 비교함에 담기'}</button>
+        </div>
+      </div>`;
+  } else {
+    /* ---------- 다중 비교 뷰 ---------- */
+    titleEl.textContent = '제품 비교';
+    const specKeySet = new Set();
+    items.forEach(p=>{ if(p.specs) Object.keys(p.specs).forEach(k=>specKeySet.add(k)); });
+    const specKeys = [...specKeySet];
 
-  const priceRow = `<tr><td><b>직원가</b></td>${items.map(p=>`<td style="color:var(--gold);font-weight:700;">${fmt(p.emp)}</td>`).join('')}</tr>`;
-
-  const specRows = specKeys.length ? specKeys.map(k=>{
-    let winVal = null;
-    const rawVals = items.map(p=> (p.specs && p.specs[k]) || null);
-    const allDiffer = new Set(rawVals).size > 1;
-    if(items.length>1 && allDiffer){
-      const nums = items.map(p=> p.specs ? parseSpecNumber(k, p.specs[k]) : null);
-      if(nums.every(n=>n!==null) && new Set(nums).size>1){
-        winVal = LOWER_IS_BETTER.has(k) ? Math.min(...nums) : Math.max(...nums);
-      }
-    }
-    const cells = items.map(p=>{
-      const raw = (p.specs && p.specs[k]) || '-';
-      let cls = '';
-      if(winVal!==null){
-        const n = parseSpecNumber(k, p.specs[k]);
-        cls = n===winVal ? ' class="spec-win"' : '';
-      } else if(allDiffer && raw!=='-'){
-        cls = ' class="spec-diff"';
-      }
-      return `<td${cls}>${raw}</td>`;
+    const headerCells = items.map(p=>{
+      const idx = PRODUCTS.indexOf(p);
+      return `<th>
+        <div class="cmp-thumb-wrap"><div class="cmp-thumb" style="background:${colorFor(idx)}">${p.model}</div></div>
+        ${p.name}<br><span style="font-weight:400;color:var(--muted);">품번 ${p.model}${p.released?' · '+p.released:''}</span>
+        <button class="cmp-remove" onclick="removeFromCompareOrClose('${p.id}')">✕ 비교에서 제외</button>
+      </th>`;
     }).join('');
-    return `<tr><td>${k}</td>${cells}</tr>`;
-  }).join('') : `<tr><td colspan="${items.length+1}" style="color:var(--muted);">등록된 사양 정보가 없습니다.</td></tr>`;
 
-  document.getElementById('compareTable').innerHTML = `
-    <tr><th>구분</th>${headerCells}</tr>
-    ${priceRow}
-    ${specRows}`;
+    const priceRow = `<tr><td><b>직원가</b></td>${items.map(p=>`<td style="color:var(--gold);font-weight:700;">${p.emp!=null?fmt(p.emp):'가격 확인중'}</td>`).join('')}</tr>`;
 
-  document.getElementById('compareInsights').innerHTML = items.length>1 ? `
-    <h4>인사이트 &amp; 추천</h4>
-    <div class="sub">각 모델의 사양을 바탕으로 어떤 상황에 더 맞는지 정리했습니다.</div>
-    <div class="insight-grid" style="grid-template-columns:repeat(${items.length},1fr)">
-      ${items.map(p=>`<div class="insight-card"><b>${p.name}</b><ul>${insightBullets(p, items).map(b=>`<li>${b}</li>`).join('')}</ul></div>`).join('')}
-    </div>` : '';
+    const specRows = specKeys.length ? specKeys.map(k=>{
+      let winVal = null;
+      const rawVals = items.map(p=> (p.specs && p.specs[k]) || null);
+      const allDiffer = new Set(rawVals).size > 1;
+      if(allDiffer){
+        const nums = items.map(p=> p.specs ? parseSpecNumber(k, p.specs[k]) : null);
+        if(nums.every(n=>n!==null) && new Set(nums).size>1){
+          winVal = LOWER_IS_BETTER.has(k) ? Math.min(...nums) : Math.max(...nums);
+        }
+      }
+      const cells = items.map(p=>{
+        const raw = (p.specs && p.specs[k]) || '-';
+        let cls = '';
+        if(winVal!==null){
+          const n = parseSpecNumber(k, p.specs[k]);
+          cls = n===winVal ? ' class="spec-win"' : '';
+        } else if(allDiffer && raw!=='-'){
+          cls = ' class="spec-diff"';
+        }
+        return `<td${cls}>${raw}</td>`;
+      }).join('');
+      return `<tr><td>${k}</td>${cells}</tr>`;
+    }).join('') : `<tr><td colspan="${items.length+1}" style="color:var(--muted);">등록된 사양 정보가 없습니다.</td></tr>`;
+
+    const insights = `
+      <div class="cmp-insights">
+        <h4>인사이트 &amp; 추천</h4>
+        <div class="sub">각 모델의 사양을 바탕으로 어떤 상황에 더 맞는지 정리했습니다.</div>
+        <div class="insight-grid" style="grid-template-columns:repeat(${items.length},1fr)">
+          ${items.map(p=>`<div class="insight-card"><b>${p.name}</b><ul>${insightBullets(p, items).map(b=>`<li>${b}</li>`).join('')}</ul></div>`).join('')}
+        </div>
+      </div>`;
+
+    content.innerHTML = `
+      <div class="cmp-legend"><span class="win-dot"></span>는 해당 항목에서 더 좋은 값(가벼움·긴 코드·높은 출력 등, 방향에 맞게 자동 판단)을 의미하며, <span class="diff-dot"></span>그 외 값이 다른 항목은 강조 표시됩니다.</div>
+      <table class="cmp-table">
+        <tr><th>구분</th>${headerCells}</tr>
+        ${priceRow}
+        ${specRows}
+      </table>
+      ${insights}`;
+  }
 
   document.getElementById('compareModalOverlay').classList.add('show');
   const box = document.querySelector('#compareModalOverlay .modal-box');
