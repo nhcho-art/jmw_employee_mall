@@ -147,6 +147,7 @@
     color:#fff; font-weight:600; font-size:13px; text-align:center; padding:12px;
   }
   .badge-row{ position:absolute; top:8px; left:8px; display:flex; gap:4px; }
+  .badge.fv{ background:var(--brand); color:#fff; }
   .badge{ font-size:10.5px; font-weight:700; padding:3px 7px; border-radius:4px; background:rgba(255,255,255,.92); color:var(--ink); }
 
   .card-body{ padding:12px 14px 14px; display:flex; flex-direction:column; gap:8px; flex:1; }
@@ -477,7 +478,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V3.4</span>
+    <span class="ver">V3.5</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -602,7 +603,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V3.4';
+const APP_VERSION = 'V3.5';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -793,6 +794,18 @@ function releaseSortKey(p){
 }
 function sortByLatest(list){ return [...list].sort((a,b)=> releaseSortKey(b) - releaseSortKey(a)); }
 
+function isFreeVoltage(p){
+  if(!p.specs) return false;
+  const text = Object.values(p.specs).join(' ');
+  if(/프리볼트|free\s*volt/i.test(text)) return true;
+  const m = text.match(/(\d{2,3})\s*[-~]\s*(\d{2,3})\s*V/i);
+  if(m){
+    const lo = parseInt(m[1]), hi = parseInt(m[2]);
+    if(lo<=130 && hi>=220) return true;
+  }
+  return false;
+}
+
 function productCard(p){
   const idx = PRODUCTS.indexOf(p);
   const qty = cart[p.id]?.qty || 0;
@@ -801,7 +814,7 @@ function productCard(p){
   return `
   <div class="card" onclick="viewSingleProduct('${p.id}')">
     <div class="thumb" style="background:${colorFor(idx)}">
-      <div class="badge-row">${p.best?'<span class="badge">BEST</span>':''}</div>
+      <div class="badge-row">${p.best?'<span class="badge">BEST</span>':''}${isFreeVoltage(p)?'<span class="badge fv">프리볼트</span>':''}</div>
       <div class="cmp-box ${checked?'checked':''}" data-id="${p.id}" onclick="event.stopPropagation(); toggleCompare('${p.id}', this)">✓</div>
       ${p.model}
     </div>
@@ -854,13 +867,23 @@ function showCategoryView(key){
 }
 
 /* ---------- 검색 ---------- */
+function productMatchesQuery(p, q){
+  if(p.name.toLowerCase().includes(q) || p.model.toLowerCase().includes(q)) return true;
+  if(q==='프리볼트' || q==='free voltage' || q==='freevolt'){ if(isFreeVoltage(p)) return true; }
+  if(p.specs){
+    for(const v of Object.values(p.specs)){
+      if(v && String(v).toLowerCase().includes(q)) return true;
+    }
+  }
+  return false;
+}
 function doSearch(){
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   const el = document.getElementById('view-search');
   if(!q){
     el.innerHTML = `<div class="view-sub">검색어를 입력해주세요.</div>`;
   } else {
-    const items = sortByLatest(PRODUCTS.filter(p=> p.name.toLowerCase().includes(q) || p.model.toLowerCase().includes(q)));
+    const items = sortByLatest(PRODUCTS.filter(p=> productMatchesQuery(p, q)));
     el.innerHTML = `
       <div class="back-row"><button onclick="showView('home')">← 홈으로</button></div>
       <div class="view-title">'${q}' 검색결과</div>
@@ -994,6 +1017,7 @@ const SPEC_PHRASE = {
 };
 function insightBullets(p, items){
   const bullets = [];
+  if(isFreeVoltage(p)) bullets.push('프리볼트(100~240V) 지원으로 해외에서도 전압 걱정 없이 사용할 수 있습니다.');
   if(p.specs && p.specs['기능']){
     p.specs['기능'].split('/').map(s=>s.trim()).filter(Boolean).forEach(f=>bullets.push(f+'를 지원합니다.'));
   }
@@ -1060,7 +1084,7 @@ function openCompareModal(idsOverride){
           <div class="single-crumb">${catLabel}</div>
           <div class="single-title">${p.name}</div>
           <div class="single-sub">품번 ${p.model}</div>
-          <div class="single-badges">${p.released?`<span>출시 ${p.released}</span>`:''}</div>
+          <div class="single-badges">${p.released?`<span>출시 ${p.released}</span>`:''}${isFreeVoltage(p)?'<span>프리볼트</span>':''}</div>
           <div class="single-price">${p.emp!=null ? fmt(p.emp) : '가격 확인중'}</div>
           ${specRows ? `<table class="single-spec">${specRows}</table>` : `<div style="color:var(--muted);font-size:13px;margin-bottom:18px;">등록된 사양 정보가 없습니다.</div>`}
           <button class="single-add-btn" ${inCompare?'disabled':''} onclick="addToCompareFromSingle('${p.id}', this)">${inCompare?'✓ 비교함에 담김':'+ 비교함에 담기'}</button>
@@ -1069,8 +1093,9 @@ function openCompareModal(idsOverride){
   } else {
     /* ---------- 다중 비교 뷰 ---------- */
     titleEl.textContent = '제품 비교';
+    const effSpecs = new Map(items.map(p=>[p.id, p.specs ? {...p.specs, ...(isFreeVoltage(p)?{'프리볼트':'지원'}:{})} : null]));
     const specKeySet = new Set();
-    items.forEach(p=>{ if(p.specs) Object.keys(p.specs).forEach(k=>specKeySet.add(k)); });
+    items.forEach(p=>{ const s=effSpecs.get(p.id); if(s) Object.keys(s).forEach(k=>specKeySet.add(k)); });
     const specKeys = [...specKeySet];
 
     const headerCells = items.map(p=>{
@@ -1086,19 +1111,20 @@ function openCompareModal(idsOverride){
 
     const specRows = specKeys.length ? specKeys.map(k=>{
       let winVal = null;
-      const rawVals = items.map(p=> (p.specs && p.specs[k]) || null);
+      const rawVals = items.map(p=> (effSpecs.get(p.id) && effSpecs.get(p.id)[k]) || null);
       const allDiffer = new Set(rawVals).size > 1;
       if(allDiffer){
-        const nums = items.map(p=> p.specs ? parseSpecNumber(k, p.specs[k]) : null);
+        const nums = items.map(p=> effSpecs.get(p.id) ? parseSpecNumber(k, effSpecs.get(p.id)[k]) : null);
         if(nums.every(n=>n!==null) && new Set(nums).size>1){
           winVal = LOWER_IS_BETTER.has(k) ? Math.min(...nums) : Math.max(...nums);
         }
       }
       const cells = items.map(p=>{
-        const raw = (p.specs && p.specs[k]) || '-';
+        const s = effSpecs.get(p.id);
+        const raw = (s && s[k]) || '-';
         let cls = '';
         if(winVal!==null){
-          const n = parseSpecNumber(k, p.specs[k]);
+          const n = parseSpecNumber(k, s && s[k]);
           cls = n===winVal ? ' class="spec-win"' : '';
         } else if(allDiffer && raw!=='-'){
           cls = ' class="spec-diff"';
