@@ -514,7 +514,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V5.1</span>
+    <span class="ver">V5.4</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -639,7 +639,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V5.1';
+const APP_VERSION = 'V5.4';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1357,6 +1357,7 @@ PRODUCTS.forEach(p=>{ MODEL_TO_CAT[normModel(p.model)] = p.cat; });
 
 // 대시보드 집계 전용 수동 매핑 — 단종/과거 품번 등 쇼핑몰 카탈로그엔 없는 품번의 분류+표시명
 const MANUAL_MODEL_OVERRIDE = {
+  'SP81': { cat:'dryer', name:'플린 (패키지)' },
   'CMCA050001': { cat:'haircare', name:'로아띠 헤어오일 80ml' },
   'CMCA070001': { cat:'haircare', name:'로아띠 크림미스트 200ml' },
   'CMCA090001': { cat:'haircare', name:'로아띠 이너리페어 본딩 트리트먼트 250ml' },
@@ -1393,7 +1394,7 @@ let _trendChart=null, _yoyChart=null, _channelAmtDonut=null, _jmwCatDonut=null, 
 
 function isExcludedErpRow(r){
   const m = String(r.model||'');
-  return m.indexOf('소모품') !== -1 || /SP ?81/i.test(m);
+  return m.indexOf('소모품') !== -1; // SP81(플린, 패키지 품번)은 실제 직원구매로 확인되어 제외 해제함
 }
 
 async function loadErpData(){
@@ -1514,7 +1515,7 @@ function renderDashboardWithData(rows){
               <div class="td-title">전체 채널</div>
               <div class="chart-box sm"><canvas id="channelAmtDonut"></canvas></div>
               <div class="td-legend">
-                ${Object.keys(chAmt).map((k2,i)=>`<div class="li"><span class="dot" style="background:${i===0?'var(--brand)':'var(--gold)'}"></span><span>${k2}</span><span class="val">${fmt(chAmt[k2])} · ${(chQty[k2]||0).toLocaleString('ko-KR')}EA</span></div>`).join('')}
+                ${Object.keys(chAmt).map((k2,i)=>`<div class="li"><span class="dot" style="background:${i===0?'var(--brand)':'var(--gold)'}"></span><span>${k2}</span><span class="val">${formatEokWon(chAmt[k2])} · ${(chQty[k2]||0).toLocaleString('ko-KR')}EA</span></div>`).join('')}
               </div>
             </div>
             <div class="td-col">
@@ -1557,7 +1558,7 @@ function renderDashboardWithData(rows){
     </div>
     <div class="mock-note">※ ERP 원본에서 품번/수량/금액/수주일만 집계된 데이터입니다 (개인정보 미포함).</div>`;
 
-  drawDashboardCharts(rows, yearRows);
+  drawDashboardCharts(rows, yearRows, scopeRows);
 }
 
 function formatEok(v){
@@ -1565,8 +1566,13 @@ function formatEok(v){
   const m = v/1000000;
   return (Math.round(m*10)/10).toLocaleString('ko-KR')+'백만';
 }
+function formatEokWon(v){
+  if(v==null) return '';
+  const m = v/1000000;
+  return (Math.round(m*10)/10).toLocaleString('ko-KR')+'백만원';
+}
 
-function drawDashboardCharts(allRows, yearRows){
+function drawDashboardCharts(allRows, yearRows, scopeRows){
   if(typeof Chart === 'undefined') return;
   if(typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
   [_trendChart,_yoyChart,_channelAmtDonut,_jmwCatDonut,_ghCatDonut].forEach(c=>{ if(c) c.destroy(); });
@@ -1616,7 +1622,7 @@ function drawDashboardCharts(allRows, yearRows){
 
   // ① 전체 채널 비중 (JMW/기화 매출액, % 표시)
   const chAmt = {};
-  yearRows.forEach(r=>{ chAmt[r.channel]=(chAmt[r.channel]||0)+r.amount; });
+  scopeRows.forEach(r=>{ chAmt[r.channel]=(chAmt[r.channel]||0)+r.amount; });
   const chTotal = Object.values(chAmt).reduce((a,b)=>a+b,0) || 1;
   _channelAmtDonut = new Chart(document.getElementById('channelAmtDonut'), {
     type:'doughnut',
@@ -1628,7 +1634,7 @@ function drawDashboardCharts(allRows, yearRows){
 
   // ②③ JMW / 기화 각각의 품목(카테고리)별 비중
   function renderCatDonut(canvasId, legendId, channelKey){
-    const sub = yearRows.filter(r=>r.channel===channelKey);
+    const sub = scopeRows.filter(r=>r.channel===channelKey);
     const map = {};
     sub.forEach(r=>{ const c=categoryOf(r.model); map[c]=(map[c]||0)+r.amount; });
     const entries = Object.entries(map).sort((a,b)=>b[1]-a[1]);
@@ -1644,7 +1650,7 @@ function drawDashboardCharts(allRows, yearRows){
           datalabels:{ color:'#fff', font:{size:9, weight:'700'}, formatter:(v)=> v/total<0.06 ? '' : Math.round(v/total*100)+'%' } } }
     });
     document.getElementById(legendId).innerHTML = entries.map(([cat,amt],i)=>`
-      <div class="li"><span class="dot" style="background:${DONUT_PALETTE[i%DONUT_PALETTE.length]}"></span><span>${CAT_LABEL[cat]||cat}</span><span class="val">${fmt(amt)}·${(qtyMap[cat]||0).toLocaleString('ko-KR')}EA</span></div>`).join('') || '<div style="color:var(--muted);">데이터 없음</div>';
+      <div class="li"><span class="dot" style="background:${DONUT_PALETTE[i%DONUT_PALETTE.length]}"></span><span>${CAT_LABEL[cat]||cat}</span><span class="val">${formatEokWon(amt)}·${(qtyMap[cat]||0).toLocaleString('ko-KR')}EA</span></div>`).join('') || '<div style="color:var(--muted);">데이터 없음</div>';
     return chart;
   }
   _jmwCatDonut = renderCatDonut('jmwCatDonut', 'jmwCatLegend', 'JMW');
