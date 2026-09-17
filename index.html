@@ -6,6 +6,7 @@
 <title>JMW 임직원 MALL</title>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -374,6 +375,16 @@
   .donut-legend .li{ display:flex; align-items:center; gap:8px; }
   .donut-legend .dot{ width:10px; height:10px; border-radius:50%; flex:none; }
   .donut-legend .val{ margin-left:auto; font-family:'JetBrains Mono',monospace; font-weight:600; }
+
+  .chart-box.sm{ height:120px; width:120px; margin:0 auto; }
+  .triple-donut{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .td-col{ text-align:center; }
+  .td-title{ font-size:11.5px; color:var(--muted); font-weight:600; margin-bottom:8px; }
+  .td-legend{ font-size:11px; margin-top:8px; display:flex; flex-direction:column; gap:4px; text-align:left; }
+  .td-legend .li{ display:flex; align-items:center; gap:5px; }
+  .td-legend .dot{ width:7px; height:7px; border-radius:50%; flex:none; }
+  .td-legend .val{ margin-left:auto; font-family:'JetBrains Mono',monospace; font-weight:600; font-size:10.5px; }
+  @media (max-width:700px){ .triple-donut{ grid-template-columns:1fr; } }
   .dash-row{ display:grid; grid-template-columns:1.3fr 1fr; gap:20px; margin-bottom:24px; }
   @media (max-width:900px){ .dash-row{ grid-template-columns:1fr; } }
   .top5-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
@@ -503,7 +514,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V5.0</span>
+    <span class="ver">V5.1</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -628,7 +639,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V5.0';
+const APP_VERSION = 'V5.1';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1378,7 +1389,7 @@ function displayNameOf(model, fallbackName){
 let erpRows = null, erpFetchPromise = null;
 let dashYear = null;
 let dashMonth = 'all'; // 'all' 또는 'MM'
-let _trendChart=null, _yoyChart=null, _channelAmtDonut=null;
+let _trendChart=null, _yoyChart=null, _channelAmtDonut=null, _jmwCatDonut=null, _ghCatDonut=null;
 
 function isExcludedErpRow(r){
   const m = String(r.model||'');
@@ -1497,10 +1508,25 @@ function renderDashboardWithData(rows){
     <div class="donut-row">
       <div class="panel">
         <div class="panel-hd">채널별 매출 비중 (JMW / 기화)</div>
-        <div class="panel-body donut-wrap">
-          <div class="chart-box"><canvas id="channelAmtDonut"></canvas></div>
-          <div class="donut-legend">
-            ${Object.keys(chAmt).map((k2,i)=>`<div class="li"><span class="dot" style="background:${i===0?'var(--brand)':'var(--gold)'}"></span><span>${k2}</span><span class="val">${fmt(chAmt[k2])} · ${(chQty[k2]||0).toLocaleString('ko-KR')}EA</span></div>`).join('')}
+        <div class="panel-body">
+          <div class="triple-donut">
+            <div class="td-col">
+              <div class="td-title">전체 채널</div>
+              <div class="chart-box sm"><canvas id="channelAmtDonut"></canvas></div>
+              <div class="td-legend">
+                ${Object.keys(chAmt).map((k2,i)=>`<div class="li"><span class="dot" style="background:${i===0?'var(--brand)':'var(--gold)'}"></span><span>${k2}</span><span class="val">${fmt(chAmt[k2])} · ${(chQty[k2]||0).toLocaleString('ko-KR')}EA</span></div>`).join('')}
+              </div>
+            </div>
+            <div class="td-col">
+              <div class="td-title">JMW 품목 비중</div>
+              <div class="chart-box sm"><canvas id="jmwCatDonut"></canvas></div>
+              <div class="td-legend" id="jmwCatLegend"></div>
+            </div>
+            <div class="td-col">
+              <div class="td-title">기화 품목 비중</div>
+              <div class="chart-box sm"><canvas id="ghCatDonut"></canvas></div>
+              <div class="td-legend" id="ghCatLegend"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1534,9 +1560,16 @@ function renderDashboardWithData(rows){
   drawDashboardCharts(rows, yearRows);
 }
 
+function formatEok(v){
+  if(v==null) return '';
+  const m = v/1000000;
+  return (Math.round(m*10)/10).toLocaleString('ko-KR')+'백만';
+}
+
 function drawDashboardCharts(allRows, yearRows){
   if(typeof Chart === 'undefined') return;
-  [_trendChart,_yoyChart,_channelAmtDonut].forEach(c=>{ if(c) c.destroy(); });
+  if(typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+  [_trendChart,_yoyChart,_channelAmtDonut,_jmwCatDonut,_ghCatDonut].forEach(c=>{ if(c) c.destroy(); });
   const noGrid = { x:{ grid:{display:false} }, y:{ grid:{display:false}, ticks:{ callback:(v)=>(v/10000).toLocaleString('ko-KR')+'만' } } };
 
   const monthAmt = {};
@@ -1547,7 +1580,9 @@ function drawDashboardCharts(allRows, yearRows){
     type:'bar',
     data:{ labels:trendMonths.map(shortYm), datasets:[{ data:trendMonths.map(m=>monthAmt[m]), backgroundColor:'#5B2247', borderRadius:4 }] },
     options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=>fmt(c.raw) } } },
+      layout:{ padding:{ top:18 } },
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=>fmt(c.raw) } },
+        datalabels:{ anchor:'end', align:'end', color:'#5B2247', font:{size:10, weight:'700'}, formatter:formatEok } },
       scales:noGrid }
   });
 
@@ -1568,21 +1603,54 @@ function drawDashboardCharts(allRows, yearRows){
         backgroundColor: y===dashYear ? '#5B2247' : '#D8CFCB', borderRadius:4
       })) },
       options:{ responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{ position:'top', labels:{ boxWidth:10, font:{size:11} } }, tooltip:{ callbacks:{ label:(c)=>c.dataset.label+' '+fmt(c.raw) } } },
+        layout:{ padding:{ top:18 } },
+        plugins:{ legend:{ position:'top', labels:{ boxWidth:10, font:{size:11} } }, tooltip:{ callbacks:{ label:(c)=>c.dataset.label+' '+fmt(c.raw) } },
+          datalabels:{ anchor:'end', align:'end', color:(ctx)=>ctx.dataset.backgroundColor, font:{size:9, weight:'700'}, formatter:formatEok } },
         scales:noGrid }
     });
   } else if(yoyBox){
     yoyBox.innerHTML = '<div style="color:var(--muted);font-size:12.5px;padding:20px 0;text-align:center;">비교할 전년도 데이터가 아직 없습니다.</div>';
   }
 
+  const DONUT_PALETTE = ['#5B2247','#B8862E','#3F5B4A','#8A3A62','#6B7A6E','#4A5568'];
+
+  // ① 전체 채널 비중 (JMW/기화 매출액, % 표시)
   const chAmt = {};
   yearRows.forEach(r=>{ chAmt[r.channel]=(chAmt[r.channel]||0)+r.amount; });
+  const chTotal = Object.values(chAmt).reduce((a,b)=>a+b,0) || 1;
   _channelAmtDonut = new Chart(document.getElementById('channelAmtDonut'), {
     type:'doughnut',
     data:{ labels:Object.keys(chAmt), datasets:[{ data:Object.values(chAmt), backgroundColor:['#5B2247','#B8862E'], borderWidth:0 }] },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, cutout:'65%' }
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
+      plugins:{ legend:{display:false},
+        datalabels:{ color:'#fff', font:{size:11, weight:'700'}, formatter:(v)=>Math.round(v/chTotal*100)+'%' } } }
   });
+
+  // ②③ JMW / 기화 각각의 품목(카테고리)별 비중
+  function renderCatDonut(canvasId, legendId, channelKey){
+    const sub = yearRows.filter(r=>r.channel===channelKey);
+    const map = {};
+    sub.forEach(r=>{ const c=categoryOf(r.model); map[c]=(map[c]||0)+r.amount; });
+    const entries = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+    const total = entries.reduce((s,e)=>s+e[1],0) || 1;
+    const qtyMap = {};
+    sub.forEach(r=>{ const c=categoryOf(r.model); qtyMap[c]=(qtyMap[c]||0)+r.qty; });
+
+    const chart = new Chart(document.getElementById(canvasId), {
+      type:'doughnut',
+      data:{ labels:entries.map(e=>CAT_LABEL[e[0]]||e[0]), datasets:[{ data:entries.map(e=>e[1]), backgroundColor:DONUT_PALETTE, borderWidth:0 }] },
+      options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
+        plugins:{ legend:{display:false},
+          datalabels:{ color:'#fff', font:{size:9, weight:'700'}, formatter:(v)=> v/total<0.06 ? '' : Math.round(v/total*100)+'%' } } }
+    });
+    document.getElementById(legendId).innerHTML = entries.map(([cat,amt],i)=>`
+      <div class="li"><span class="dot" style="background:${DONUT_PALETTE[i%DONUT_PALETTE.length]}"></span><span>${CAT_LABEL[cat]||cat}</span><span class="val">${fmt(amt)}·${(qtyMap[cat]||0).toLocaleString('ko-KR')}EA</span></div>`).join('') || '<div style="color:var(--muted);">데이터 없음</div>';
+    return chart;
+  }
+  _jmwCatDonut = renderCatDonut('jmwCatDonut', 'jmwCatLegend', 'JMW');
+  _ghCatDonut = renderCatDonut('ghCatDonut', 'ghCatLegend', '기화');
 }
+
 
 
 /* ---------- init ---------- */
