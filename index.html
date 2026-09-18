@@ -549,7 +549,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.9</span>
+    <span class="ver">V7.11</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -696,7 +696,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.9';
+const APP_VERSION = 'V7.11';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1031,7 +1031,7 @@ const PRODUCTS = [
   { id:'p109', cat:"haircare", model:"CST03-0001", name:"얼티밋 바운시 컬크림 150ml", emp:2600, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000098" },
   { id:'p110', cat:"haircare", model:"CCA06-0001", name:"에어리샤워 미스트 200ml", emp:5800, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000103" },
   { id:'p111', cat:"haircare", model:"CCA07-0001", name:"모로운 (퓨리파잉) 샴푸 본품 750ml", emp:9100, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000105" },
-  { id:'p111b', cat:"haircare", model:"CCA07-0002", name:"모로운 (너리싱) 샴푸 본품 750ml", emp:null, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000105", comingSoon:true },
+  { id:'p111b', cat:"haircare", model:"CCA07-0002", name:"모로운 (너리싱) 샴푸 본품 750ml", emp:9100, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000105" },
   { id:'p112', cat:"haircare", model:"CCA07-0005", name:"모로운 (퓨리파잉/너리싱) 샴푸 미니어처 50ml", emp:null, released:null, specs:null, url:null , comingSoon:true },
   { id:'p113', cat:"haircare", model:"CCA08-0001", name:"플렉서블 더블본딩 클리닉 본품 1,000g", emp:12000, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000109" },
   { id:'p114', cat:"haircare", model:"CCA08-0002", name:"플렉서블 더블본딩 클리닉 미니어처 250g", emp:null, released:null, specs:null, url:null , comingSoon:true },
@@ -1767,13 +1767,12 @@ function submitOrder(){
   }
   fetch(ORDER_APPS_SCRIPT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Script CORS 우회용
+    mode: 'no-cors', // Apps Script 웹앱 응답은 브라우저에서 읽을 수 없어(CORS) 요청만 보내고 응답은 확인하지 않음
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(payload)
-  }).then(r=>{
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.json();
-  }).then(res=>{
-    finish(res && res.ok !== false);
+  }).then(()=>{
+    // no-cors 모드는 응답 내용을 알 수 없지만, 여기까지 오면(네트워크 자체는 성공) 접수된 것으로 처리
+    finish(true);
   }).catch(()=>{ finish(false); });
 }
 
