@@ -550,7 +550,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.5</span>
+    <span class="ver">V7.7</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -697,7 +697,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.5';
+const APP_VERSION = 'V7.7';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1032,7 +1032,7 @@ const PRODUCTS = [
   { id:'p109', cat:"haircare", model:"CST03-0001", name:"얼티밋 바운시 컬크림 150ml", emp:2600, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000098" },
   { id:'p110', cat:"haircare", model:"CCA06-0001", name:"에어리샤워 미스트 200ml", emp:5800, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000103" },
   { id:'p111', cat:"haircare", model:"CCA07-0001", name:"모로운 (퓨리파잉) 샴푸 본품 750ml", emp:9100, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000105" },
-  { id:'p111b', cat:"haircare", model:"CCA07-0002", name:"모로운 (너리싱) 샴푸 본품 750ml", emp:null, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000105" },
+  { id:'p111b', cat:"haircare", model:"CCA07-0002", name:"모로운 (너리싱) 샴푸 본품 750ml", emp:null, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000105", comingSoon:true },
   { id:'p112', cat:"haircare", model:"CCA07-0005", name:"모로운 (퓨리파잉/너리싱) 샴푸 미니어처 50ml", emp:null, released:null, specs:null, url:null , comingSoon:true },
   { id:'p113', cat:"haircare", model:"CCA08-0001", name:"플렉서블 더블본딩 클리닉 본품 1,000g", emp:12000, released:null, specs:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000109" },
   { id:'p114', cat:"haircare", model:"CCA08-0002", name:"플렉서블 더블본딩 클리닉 미니어처 250g", emp:null, released:null, specs:null, url:null , comingSoon:true },
@@ -1275,11 +1275,14 @@ function doSearch(){
 }
 
 /* ---------- 수량/장바구니 ---------- */
+function setQtyDisplay(id, val){
+  document.querySelectorAll('[id="qty-'+id+'"]').forEach(el=>{ el.textContent = val; });
+}
 function stepQty(id, delta){
-  const el = document.getElementById('qty-'+id);
-  let v = parseInt(el.textContent,10) + delta;
+  const els = document.querySelectorAll('[id="qty-'+id+'"]');
+  let v = (parseInt(els[0]?.textContent,10) || 0) + delta;
   if(v<0) v=0;
-  el.textContent = v;
+  setQtyDisplay(id, v);
   pendingQty[id]=v;
 }
 function addToCart(id){
@@ -1288,8 +1291,7 @@ function addToCart(id){
   const qty = pendingQty[id] ?? (cart[id]?.qty||0);
   const finalQty = qty>0 ? qty : 1;
   cart[id] = { ...p, qty: finalQty };
-  const qtyEl = document.getElementById('qty-'+id);
-  if(qtyEl) qtyEl.textContent = finalQty;
+  setQtyDisplay(id, finalQty);
   saveCart(cart);
   renderCartUI();
   document.getElementById('addedModalOverlay').classList.add('show');
@@ -1318,8 +1320,7 @@ function confirmPackageNotice(){
 function removeFromCart(id){
   delete cart[id];
   saveCart(cart);
-  const qtyEl = document.getElementById('qty-'+id);
-  if(qtyEl) qtyEl.textContent = 0;
+  setQtyDisplay(id, 0);
   renderCartUI();
 }
 function changeCartQty(id, delta){
@@ -1327,8 +1328,7 @@ function changeCartQty(id, delta){
   cart[id].qty += delta;
   if(cart[id].qty<=0) delete cart[id];
   saveCart(cart);
-  const qtyEl = document.getElementById('qty-'+id);
-  if(qtyEl) qtyEl.textContent = cart[id]?cart[id].qty:0;
+  setQtyDisplay(id, cart[id]?cart[id].qty:0);
 }
 function drawerQtyChange(id, delta){ changeCartQty(id, delta); renderCartUI(); }
 function cartCount(){ return Object.values(cart).reduce((s,i)=>s+i.qty,0); }
