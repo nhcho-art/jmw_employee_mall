@@ -538,7 +538,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.1</span>
+    <span class="ver">V7.2</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -581,6 +581,9 @@
     <div style="font-size:13.5px; line-height:1.6; color:var(--ink); text-align:left; margin-bottom:6px;">
       직원구매는 <b>모델 단품만 출고</b>됩니다.<br>
       자사몰·타 쇼핑몰 링크에 표시된 <b>패키지 구성품이나 사은품은 직원구매에 포함되지 않으니</b> 착오 없으시길 바랍니다.
+    </div>
+    <div style="font-size:13.5px; line-height:1.6; color:var(--ink); text-align:left; margin-bottom:6px;">
+      📍 여러 배송지로 보낼 경우 <b>주문을 나눠서</b> 해주시기 바랍니다.
     </div>
     <div class="added-actions">
       <button class="cancel-btn" onclick="closePackageNotice()">취소</button>
@@ -637,7 +640,10 @@
       </div>
 
       <div id="bankFields">
-        <div class="notice-box" style="margin-bottom:14px;">계좌이체 : 기업은행 164-106990-01-013 (제이엠더블유)</div>
+        <div class="notice-box" style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <span>계좌이체 : 기업은행 164-106990-01-013 (제이엠더블유)</span>
+          <button type="button" id="copyBankBtn" onclick="copyBankAccount(this)" style="flex:none; padding:5px 10px; font-size:11.5px; font-weight:600; border:1px solid var(--brand); color:var(--brand); background:#fff; border-radius:6px; cursor:pointer; white-space:nowrap;">복사</button>
+        </div>
         <div class="field-row two">
           <div>
             <label>입금자명 <span class="req">(필수)</span></label>
@@ -679,7 +685,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.1';
+const APP_VERSION = 'V7.2';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -780,6 +786,8 @@ const CATEGORIES = [
 ];
 
 const PRODUCT_IMAGES = {
+"FA-DRY_A": "assets/images/FA-DRY_A.jpg",
+"FA-FILTER_A": "assets/images/FA-FILTER_A.jpg",
 "MS6301A": "assets/images/MS6301A.jpg",
 "MCS6001A": "assets/images/MCS6001A.jpg",
 "MCS6002B": "assets/images/MCS6002B.jpg",
@@ -1021,8 +1029,8 @@ const PRODUCTS = [
   { id:'p116b', cat:"acc", model:"Stand-04W(C)", name:"드라이기 거치대 화이트", emp:5000, released:null, url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000008", specs:null },
   { id:'p117', cat:"styler", model:"HCS7001A", name:"POWER SWING [파워스윙]", emp:86000, released:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000097", specs:null },
   { id:'p118', cat:"styler", model:"HC5002B", name:"POWER SLIM [파워슬림]", emp:59000, released:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000096", specs:null },
-  { id:'p119', cat:"acc", model:"FA-DRY_A", name:"바이툴즈 음식물처리기 건조통", emp:null, released:null, specs:null, comingSoon:true },
-  { id:'p120', cat:"acc", model:"FA-FILTER_A", name:"바이툴즈 음식물처리기 필터", emp:null, released:null, specs:null, comingSoon:true },
+  { id:'p119', cat:"acc", model:"FA-DRY_A", name:"바이툴즈 음식물처리기 건조통", emp:null, released:null, specs:null, url:"https://bytulz.co.kr/product/detail.html?product_no=33&cate_no=50&display_group=1", comingSoon:true },
+  { id:'p120', cat:"acc", model:"FA-FILTER_A", name:"바이툴즈 음식물처리기 필터", emp:null, released:null, specs:null, url:"https://bytulz.co.kr/product/detail.html?product_no=34&cate_no=50&display_group=1", comingSoon:true },
 ];
 
 const SPEC_MODEL_TO_CAT = {"DM1512A": "dryer", "DM1525B": "dryer", "DM2001A": "dryer", "DM5514A": "dryer", "DM5525B": "dryer", "DM5535C": "dryer", "DM5545D": "dryer", "DM5565E": "dryer", "DM6001A": "dryer", "DM6528B": "dryer", "DM6020C": "dryer", "DS1514A": "dryer", "DS1523B": "dryer", "DS2021B": "dryer", "DS2031C": "dryer", "DS3514A": "dryer", "DS3534C": "dryer", "DS3703ED": "dryer", "HM5010A": "dryer", "HM5010B": "dryer", "I5001A": "dryer", "I5011B": "dryer", "I5021C": "dryer", "M3001A": "dryer", "M3040F": "dryer", "M3050F": "dryer", "M3060F": "dryer", "M3150R": "dryer", "M3150RSE": "dryer", "M3505E": "dryer", "M3602H": "dryer", "M3701K": "dryer", "M3206B": "dryer", "M3307C": "dryer", "M3405D": "dryer", "M3801LWS": "dryer", "MH3170": "dryer", "M3901J": "dryer", "MC3A01A": "dryer", "MC3A02B": "dryer", "MC4A01A": "dryer", "MC4A02B": "dryer", "HHDJM1550W": "dryer", "MC4B01A": "dryer", "MC4B02B": "dryer", "MC4B03C": "dryer", "MC5A01A": "dryer", "MC5A02B": "dryer", "M5001A": "dryer", "M5150R": "dryer", "M5150RS": "dryer", "M5035C": "dryer", "M5042D": "dryer", "M5802A": "dryer", "M5001APLUS": "dryer", "M5001APLUSPRO": "dryer", "M5001APLUSPROW": "dryer", "M5061FWS": "dryer", "M5201A": "dryer", "M5002BPLUS": "dryer", "M7502A": "dryer", "M7502APLUS": "dryer", "MA5001A": "dryer", "MA503B": "dryer", "MA6001A": "dryer", "MG1700": "dryer", "MG1800": "dryer", "MG1700PLUS": "dryer", "MG1800PLUS": "dryer", "THENEWMG1800": "dryer", "MF5001A": "dryer", "MF5002B": "dryer", "ATOMYHAIRDRYER": "dryer", "MF5030C": "dryer", "MF5040D": "dryer", "MF5050E": "dryer", "MF5060F": "dryer", "MF5101DWS": "dryer", "MF5102F": "dryer", "MCF5A01A": "dryer", "MCF5A02B": "dryer", "MCF5A03C": "dryer", "MCF5A02B벨리곰": "dryer", "MCF5B01A": "dryer", "MF6001A": "dryer", "MF6002B": "dryer", "MF6003C": "dryer", "MS502": "dryer", "MS6001A": "dryer", "MS6020B": "dryer", "MS6010A": "dryer", "MS6003C": "dryer", "MS6004D": "dryer", "MS6100A": "dryer", "TR6100A": "dryer", "MS6030C": "dryer", "MS6040D": "dryer", "MS6210A": "dryer", "MS6031E": "dryer", "MS6041F": "dryer", "MS6301A": "dryer", "MS6301AM": "dryer", "CC6310A": "dryer", "CC6311B": "dryer", "MS6401A": "dryer", "MS6402B": "dryer", "MC6001A": "dryer", "MC6002B": "dryer", "MC6A11A": "dryer", "MCS6001A": "dryer", "MCS6002B": "dryer", "MCS6003C": "dryer", "MCS6004D": "dryer", "MCS6003C벨리곰": "dryer", "MVF6A01A": "dryer", "MS7002B": "dryer", "MS7001A": "dryer", "MCP7A01A": "dryer", "MS8001A": "dryer", "MS8002B": "dryer", "M8001A": "dryer", "M8001AB": "dryer", "S30001A": "dryer", "SD7001A": "dryer", "SC7010A": "dryer", "SC7020B": "dryer", "STL7001A": "dryer", "STL7002B": "dryer", "STL7101A": "dryer", "MP9A01A": "dryer", "MP9A02B": "dryer", "MCI8A01A": "dryer", "SDU3A01A": "dryer", "SC1500A": "dryer", "SC1500B": "dryer", "SDA5A01A": "dryer", "SDN3A1A": "dryer", "SDF4B1A": "dryer", "SDS3A1A": "dryer", "SAT3A2B": "dryer", "SAT3A1A": "dryer", "SDMF4A1A": "dryer", "W1001A": "styler", "W1014A": "styler", "W1014B": "styler", "W1014C": "styler", "W2001MA": "styler", "W2203MA": "styler", "W2304MC": "styler", "W2305MD": "styler", "W2101MD": "styler", "W2010ME": "styler", "W5001LA": "styler", "W5001MA": "styler", "W5001RA": "styler", "W5001SA": "styler", "W6001MA": "styler", "W6001RA": "styler", "W6014MB": "styler", "W7001RA": "styler", "W7700MA": "styler", "W7700LA": "styler", "W7700RA": "styler", "W7700RSA": "styler", "W7700SA": "styler", "W7700MD": "styler", "W7900LA": "styler", "W7900MA": "styler", "W7900SA": "styler", "W7900RA": "styler", "W7900RSA": "styler", "W8001LA": "styler", "W8001MA": "styler", "W8001RA": "styler", "W8001SA": "styler", "W9001MA": "styler", "WR3016A": "styler", "WR3207B": "styler", "WR4011A": "styler", "WR4011B": "styler", "WR4011C": "styler", "WS5001MA": "styler", "WS5001RA": "styler", "WS5002MB": "styler", "WS5002RB": "styler", "CWS5011MC": "styler", "WS6001A": "styler", "WS6002B": "styler", "WN8A01LA": "styler", "WN8A01MA": "styler", "WN8A01RA": "styler", "WN8A01SA": "styler", "WN8A01RSA": "styler", "SW3A01MA": "styler", "SRB3A01A": "styler", "SRB3A02B": "styler", "SRB3A03C": "styler", "SRI5A01A": "styler", "SWC5A01A": "styler", "SRB4A01A": "styler", "WC5028A": "styler", "WC5032A": "styler", "WC5036A": "styler", "WC5040A": "styler", "WCS6032A": "styler", "WCS6036A": "styler", "WCS6040A": "styler", "WCS4A36A": "styler", "WCS4A40A": "styler", "WCS5A36A": "styler", "WCS5A40A": "styler", "WCS5A36B": "styler", "WCS5A40B": "styler", "JBD1900A": "life", "CLS5A01A": "life", "CLS3A01A": "life", "CTS7A01A": "life", "CMF1000A": "life", "FA01A": "life", "FAFILTERA": "life", "FADRYA": "life", "NM3A01A": "dryer", "NM3A02B": "dryer", "STAND04W(C)": "acc"};
@@ -1583,6 +1591,28 @@ function renderOrderSummary(){
           <td>${fmt(i.emp*i.qty)}</td>
         </tr>`).join('')}
     </table>`;
+}
+
+function copyBankAccount(btn){
+  const text = '164-106990-01-013';
+  const done = ()=>{
+    const old = btn.textContent;
+    btn.textContent = '복사됨';
+    setTimeout(()=>{ btn.textContent = old; }, 1500);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>{
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); }catch(e){}
+      document.body.removeChild(ta);
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); done(); }catch(e){}
+    document.body.removeChild(ta);
+  }
 }
 
 function setPayMethod(m){
