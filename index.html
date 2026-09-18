@@ -228,6 +228,7 @@
     display:none; align-items:center; justify-content:center; padding:20px;
   }
   .modal-overlay.show{ display:flex; }
+  #packageNoticeOverlay{ z-index:95; }
   .modal-box{ background:var(--surface); border-radius:12px; max-width:760px; width:100%; max-height:80vh; overflow:auto; padding:24px; }
   .modal-box.compare-box{ max-width:calc(var(--maxw) + 80px); }
   .cmp-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
@@ -537,7 +538,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.0</span>
+    <span class="ver">V7.1</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -678,7 +679,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.0';
+const APP_VERSION = 'V7.1';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -779,6 +780,8 @@ const CATEGORIES = [
 ];
 
 const PRODUCT_IMAGES = {
+"MS6301A": "assets/images/MS6301A.jpg",
+"MCS6001A": "assets/images/MCS6001A.jpg",
 "MCS6002B": "assets/images/MCS6002B.jpg",
 "MC6001A": "assets/images/MC60.jpg",
 "MC6002B": "assets/images/MC60.jpg",
@@ -937,10 +940,10 @@ const PRODUCTS = [
   { id:'p38', cat:"dryer", model:"MS6210A", name:"MS6210A", emp:52000, released:"2020.03", url:"https://prod.danawa.com/info/?pcode=11477721", specs:{"모터":"BLDC", "와트":"1,600W급", "사이즈":"240x280x70mm", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"웜그레이", "풍온":"1단 : 100.0 ℃ / 2단 : 140.0 ℃ / 3단 : 130.0 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
   { id:'p39', cat:"dryer", model:"MS6031E", name:"AIR JET ULTRA [에어젯 울트라] 블랙", emp:52000, released:"2021.03", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=88", specs:{"모터":"BLDC", "와트":"1,650W급", "사이즈":"240x280x70mm", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"블랙", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단 : 100.0 ℃ / 2단 : 140.0 ℃ / 3단 : 130.0 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
   { id:'p40', cat:"dryer", model:"MS6041F", name:"AIR JET ULTRA [에어젯 울트라] 페일 오렌지 핑크", emp:52000, released:"2021.04", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=89", specs:{"모터":"BLDC", "와트":"1,650W급", "사이즈":"240x280x70mm", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"페일 오렌지 핑크", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단 : 100.0 ℃ / 2단 : 140.0 ℃ / 3단 : 130.0 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
-  { id:'p900', cat:"dryer", model:"MS6301A", name:"AIR JET ULTRA PRO [에어젯 울트라 프로] 블랙", emp:null, released:null, url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000248", specs:{"색상":"블랙"} , comingSoon:true },
+  { id:'p900', cat:"dryer", model:"MS6301A", name:"AIR JET ULTRA PRO [에어젯 울트라 프로] 블랙", emp:52000, released:null, url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000248", specs:{"색상":"블랙"} },
   { id:'p41', cat:"dryer", model:"MC6001A", name:"AIR ART [에어 아트] 화이트", emp:50000, released:"2020.11", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000039", specs:{"모터":"BLDC", "와트":"1600W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"370g / (코드, 노즐 / 제외)", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"화이트", "풍온":"1단: 93 ℃ / 2단: 121 ℃ / 3단: 106 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
   { id:'p42', cat:"dryer", model:"MC6002B", name:"AIR ART [에어 아트] 그레이", emp:50000, released:"2020.11", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000040", specs:{"모터":"BLDC", "와트":"1600W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"370g / (코드, 노즐 / 제외)", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"그레이", "풍온":"1단: 93 ℃ / 2단: 121 ℃ / 3단: 106 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
-  { id:'p43', cat:"dryer", model:"MCS6001A", name:"Touch ON [터치온] 그레이", emp:null, released:"2020.07", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000026", specs:{"모터":"BLDC", "와트":"1650W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"366g / (코드,노즐 제외", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"그레이", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 93 ℃ / 2단: 115 ℃ / 3단: 132 ℃", "풍속":"1단: 8.5m / s / 2단: 10.7m / s / 3단: 12.5m / s", "기능":"Auto Pause / (터치센서) / Safe Mode / (세이프 모드)"} , comingSoon:true },
+  { id:'p43', cat:"dryer", model:"MCS6001A", name:"Touch ON [터치온] 그레이", emp:64000, released:"2020.07", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000026", specs:{"모터":"BLDC", "와트":"1650W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"366g / (코드,노즐 제외", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"그레이", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 93 ℃ / 2단: 115 ℃ / 3단: 132 ℃", "풍속":"1단: 8.5m / s / 2단: 10.7m / s / 3단: 12.5m / s", "기능":"Auto Pause / (터치센서) / Safe Mode / (세이프 모드)"} },
   { id:'p44', cat:"dryer", model:"MCS6002B", name:"Touch ON [터치온] 핑크", emp:64000, released:"2020.07", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000028", specs:{"모터":"BLDC", "와트":"1650W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"366g / (코드,노즐 제외", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"핑크", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 93 ℃ / 2단: 115 ℃ / 3단: 132 ℃", "풍속":"1단: 8.5m / s / 2단: 10.7m / s / 3단: 12.5m / s", "기능":"Auto Pause / (터치센서) / Safe Mode / (세이프 모드)"} },
   { id:'p45', cat:"dryer", model:"MCS6003C", name:"Touch ON [터치온] 화이트", emp:64000, released:"2021.06", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000069", specs:{"모터":"BLDC", "와트":"1650W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"366g / (코드,노즐 제외", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"화이트", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 93 ℃ / 2단: 115 ℃ / 3단: 132 ℃", "풍속":"1단: 8.5m / s / 2단: 10.7m / s / 3단: 12.5m / s", "기능":"Auto Pause / (터치센서) / Safe Mode / (세이프 모드)"} },
   { id:'p46', cat:"dryer", model:"MCS6004D", name:"Touch ON [터치온] 오션 그레이", emp:64000, released:"2021.06", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000068", specs:{"모터":"BLDC", "와트":"1650W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"366g / (코드,노즐 제외", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"오션그레이", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 93 ℃ / 2단: 115 ℃ / 3단: 132 ℃", "풍속":"1단: 8.5m / s / 2단: 10.7m / s / 3단: 12.5m / s", "기능":"Auto Pause / (터치센서) / Safe Mode / (세이프 모드)"} },
@@ -1234,6 +1237,7 @@ function goToOrderFromAdded(){ closeAddedModal(); openOrderModal(); }
 let pendingOrderFlow = null;
 function showPackageNotice(flow){
   pendingOrderFlow = flow;
+  document.getElementById('addedModalOverlay').classList.remove('show');
   document.getElementById('packageNoticeOverlay').classList.add('show');
 }
 function closePackageNotice(){
