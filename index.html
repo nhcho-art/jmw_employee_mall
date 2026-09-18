@@ -538,7 +538,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.3</span>
+    <span class="ver">V7.4</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -615,12 +615,12 @@
       </div>
       <div class="field-row two">
         <div><label>주문자명 <span class="req">(필수)</span></label><input id="ofName" type="text" oninput="syncRecipient()"></div>
-        <div><label>주문자 연락처 <span class="req">(필수)</span></label><input id="ofPhone" type="text" placeholder="010-0000-0000" oninput="syncRecipient()"></div>
+        <div><label>주문자 연락처 <span class="req">(필수)</span></label><input id="ofPhone" type="text" placeholder="010-0000-0000" oninput="formatPhoneInput(this); syncRecipient()"></div>
       </div>
       <label class="chk-row"><input type="checkbox" id="ofSameRecipient" checked onchange="syncRecipient()"> 수령인 정보 주문자와 동일</label>
       <div class="field-row two">
         <div><label>수령인 <span class="req">(필수)</span></label><input id="ofRecvName" type="text" disabled></div>
-        <div><label>수령인 연락처 <span class="req">(필수)</span></label><input id="ofRecvPhone" type="text" placeholder="010-0000-0000" disabled></div>
+        <div><label>수령인 연락처 <span class="req">(필수)</span></label><input id="ofRecvPhone" type="text" placeholder="010-0000-0000" oninput="formatPhoneInput(this)" disabled></div>
       </div>
       <div class="field-row">
         <label>배송주소 <span class="req">(필수)</span></label>
@@ -685,7 +685,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.3';
+const APP_VERSION = 'V7.4';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1630,6 +1630,21 @@ function setPaidStatus(v){
 function toggleCashReceipt(){
   const on = document.getElementById('ofCashReceipt').checked;
   document.getElementById('cashReceiptRow').style.display = on ? 'block' : 'none';
+}
+
+function formatPhoneInput(el){
+  let d = el.value.replace(/\D/g,'').slice(0,11);
+  let out = d;
+  if(d.startsWith('02')){ // 서울 지역번호(2자리)
+    if(d.length>9) out = d.replace(/(\d{2})(\d{4})(\d{4})/,'$1-$2-$3');
+    else if(d.length>5) out = d.replace(/(\d{2})(\d{3,4})(\d{0,4})/,'$1-$2-$3').replace(/-$/,'');
+    else if(d.length>2) out = d.replace(/(\d{2})(\d{0,4})/,'$1-$2').replace(/-$/,'');
+  } else { // 휴대폰(010 등) 및 그 외 지역번호(3자리)
+    if(d.length>10) out = d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');
+    else if(d.length>6) out = d.replace(/(\d{3})(\d{3,4})(\d{0,4})/,'$1-$2-$3').replace(/-$/,'');
+    else if(d.length>3) out = d.replace(/(\d{3})(\d{0,4})/,'$1-$2').replace(/-$/,'');
+  }
+  el.value = out;
 }
 
 function syncRecipient(){
