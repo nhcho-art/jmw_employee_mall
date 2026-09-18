@@ -507,6 +507,17 @@
   .banner-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.55); cursor:pointer; }
   .banner-dots span.active{ background:#fff; }
   .cat-banner img{ width:100%; height:auto; display:block; }
+  /* ---------- 이용방법 ---------- */
+  .guide-section{ margin-bottom:30px; padding-bottom:26px; border-bottom:1px solid var(--border); }
+  .guide-section:last-child{ border-bottom:none; }
+  .guide-section h3{ font-size:16px; margin-bottom:14px; }
+  .guide-steps{ list-style:none; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .guide-steps li{ font-size:13.5px; line-height:1.6; color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .guide-steps li b{ display:block; margin-bottom:2px; color:var(--brand); }
+  .guide-list{ list-style:disc; padding-left:20px; display:flex; flex-direction:column; gap:8px; }
+  .guide-list li{ font-size:13.5px; line-height:1.6; color:var(--ink); }
+  .guide-note{ margin-top:12px; font-size:12.5px; color:var(--muted); background:var(--surface); border-radius:8px; padding:10px 12px; }
+  .hl{ color:var(--brand); font-weight:700; }
 </style>
 </head>
 <body>
@@ -532,13 +543,14 @@
   <div class="view" id="view-category"></div>
   <div class="view" id="view-search"></div>
   <div class="view" id="view-dashboard"></div>
+  <div class="view" id="view-guide"></div>
 </main>
 
 <footer class="site-footer">
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.4</span>
+    <span class="ver">V7.5</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -685,7 +697,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.4';
+const APP_VERSION = 'V7.5';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1055,7 +1067,9 @@ function renderNav(activeKey){
   const nav = document.getElementById('catNav');
   nav.innerHTML = CATEGORIES.map(c=>
     `<button data-cat="${c.key}" class="${c.key===activeKey?'active':''}" onclick="showCategoryView('${c.key}')">${c.label}</button>`
-  ).join('') + `<button class="dash-link ${activeKey==='dashboard'?'active':''}" onclick="showView('dashboard')">DASHBOARD</button>`;
+  ).join('')
+  + `<button class="dash-link ${activeKey==='guide'?'active':''}" onclick="showView('guide')">이용방법</button>`
+  + `<button class="dash-link ${activeKey==='dashboard'?'active':''}" onclick="showView('dashboard')">DASHBOARD</button>`;
 }
 
 function setActiveView(id){
@@ -1067,6 +1081,47 @@ function setActiveView(id){
 function showView(name){
   if(name==='home'){ renderHome(); renderNav(null); setActiveView('view-home'); }
   if(name==='dashboard'){ renderDashboard(); renderNav('dashboard'); setActiveView('view-dashboard'); }
+  if(name==='guide'){ renderGuide(); renderNav('guide'); setActiveView('view-guide'); }
+}
+
+function renderGuide(){
+  const el = document.getElementById('view-guide');
+  el.innerHTML = `
+    <div class="view-title">이용방법</div>
+    <div class="view-sub" style="margin-bottom:22px;">임직원 MALL을 처음 쓰시는 분들을 위한 간단 안내입니다</div>
+
+    <section class="guide-section">
+      <h3>🛒 주문하는 방법 및 순서</h3>
+      <ol class="guide-steps">
+        <li><b>① 상품 담기</b> — 원하는 모델의 수량을 정하고 <span class="hl">담기</span> 버튼을 누르면 장바구니에 추가됩니다.</li>
+        <li><b>② 계속 쇼핑 또는 주문서 이동</b> — 담은 직후 뜨는 팝업에서 다른 상품을 더 담을지, 바로 주문서로 갈지 선택합니다.</li>
+        <li><b>③ 단품출고 안내 확인</b> — 직원구매는 모델 단품만 출고되며, 자사몰·타 쇼핑몰의 패키지 구성품/사은품은 포함되지 않는다는 안내가 뜹니다. 확인 후 다음으로 진행합니다.</li>
+        <li><b>④ 주문서 작성</b> — 소속부서, 주문자, 수령인, 배송지를 입력합니다. "수령인 정보 주문자와 동일" 체크박스를 해제하면 다른 사람 앞으로도 보낼 수 있습니다.</li>
+        <li><b>⑤ 결제수단 선택</b> — 계좌이체 선택 시 화면에 뜨는 계좌번호로 입금 후 입금자명·입금여부를 입력합니다. 카드결제는 영업지원팀 문경현 대리에게 별도로 문의해주세요.</li>
+        <li><b>⑥ 발주하기</b> — 모든 필수 항목 입력 후 발주하기를 누르면 주문이 접수됩니다.</li>
+      </ol>
+      <div class="guide-note">📍 배송지가 여러 곳이라면 한 번에 담지 말고 <b>배송지별로 따로 담아서 따로 주문</b>해주세요.</div>
+    </section>
+
+    <section class="guide-section">
+      <h3>⚖️ 제품 비교하는 방법</h3>
+      <ol class="guide-steps">
+        <li><b>① 비교할 제품 체크</b> — 각 제품 카드 우측 상단의 체크박스를 선택합니다. (PC 최대 4개, 모바일 최대 2개)</li>
+        <li><b>② 하단 "비교하기" 바 클릭</b> — 화면 하단에 뜨는 바를 눌러야 비교창이 열립니다. (카드를 그냥 클릭하면 비교가 아니라 제품 상세정보가 열립니다)</li>
+        <li><b>③ 비교표 확인</b> — 무게·가격 등 항목별로 더 우수한 쪽이 강조 표시되고, 인사이트 문구도 함께 제공됩니다.</li>
+      </ol>
+    </section>
+
+    <section class="guide-section">
+      <h3>🔎 정렬 및 기타 안내</h3>
+      <ul class="guide-list">
+        <li><b>정렬 기준</b> — 카테고리 페이지에서 "출시순"(최신 출시 우선) / "인기순"(당해년도 ERP 판매량 기준) 선택 가능합니다.</li>
+        <li><b>COMING SOON 뱃지</b> — 아직 사진 또는 가격이 확정되지 않은 상품이며, 담기가 비활성화되어 있습니다.</li>
+        <li><b>프리볼트 뱃지</b> — 해외에서도(100~240V) 사용 가능한 모델에 표시됩니다.</li>
+        <li><b>검색</b> — 상단 검색창에 모델명 또는 품번을 입력하면 사양 값까지 함께 검색됩니다.</li>
+        <li><b>문의</b> — 우측 하단 구글챗 아이콘을 누르면 영업지원팀 문경현 대리에게 바로 문의할 수 있습니다.</li>
+      </ul>
+    </section>`;
 }
 
 /* ---------- 카드 렌더 ---------- */
