@@ -485,6 +485,25 @@
   .submit-order-btn{ flex:2; background:var(--brand); color:#fff; border:none; border-radius:8px; height:46px; font-size:14.5px; font-weight:700; cursor:pointer; }
 
   .mock-note{ text-align:center; color:var(--muted); font-size:11.5px; margin-top:50px; padding-top:16px; border-top:1px dashed var(--border); }
+
+  /* ---------- 배너 ---------- */
+  .banner-wrap{ position:relative; width:100%; overflow:hidden; margin-bottom:28px; border-radius:10px; background:#eee; }
+  .banner-slides{ display:flex; transition:transform .45s ease; touch-action:pan-y; cursor:grab; }
+  .banner-slides.dragging{ transition:none; cursor:grabbing; }
+  .banner-slide{ flex:0 0 100%; position:relative; }
+  .banner-slide img{ width:100%; height:auto; display:block; pointer-events:none; -webkit-user-drag:none; }
+  .banner-text{ position:absolute; left:5%; top:50%; transform:translateY(-50%); max-width:46%; pointer-events:none; }
+  .banner-text .sub{ font-size:clamp(11px,1.4vw,15px); color:#333; margin-bottom:8px; font-weight:500; }
+  .banner-text .head{ font-size:clamp(18px,2.6vw,32px); font-weight:800; color:#111; line-height:1.3; }
+  .banner-text.reverse .sub{ order:2; margin-bottom:0; margin-top:8px; }
+  .banner-text.reverse{ display:flex; flex-direction:column; }
+  .banner-arrow{ position:absolute; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.85); border:none; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; z-index:5; box-shadow:0 1px 4px rgba(0,0,0,.15); }
+  .banner-arrow.prev{ left:12px; } .banner-arrow.next{ right:12px; }
+  .banner-dots{ position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:5; }
+  .banner-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.55); cursor:pointer; }
+  .banner-dots span.active{ background:#fff; }
+  .cat-banner{ margin-bottom:22px; border-radius:10px; overflow:hidden; }
+  .cat-banner img{ width:100%; height:auto; display:block; }
 </style>
 </head>
 <body>
@@ -516,7 +535,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V6.8</span>
+    <span class="ver">V6.9</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -641,7 +660,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V6.8';
+const APP_VERSION = 'V6.9';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -659,6 +678,74 @@ document.addEventListener('keydown', e=>{
 const COLORS = ['#5B2247','#8A3A62','#3F3A38','#B8862E','#6B7A6E','#4A5568'];
 function colorFor(seed){ return COLORS[seed % COLORS.length]; }
 function fmt(n){ return n.toLocaleString('ko-KR')+'원'; }
+
+/* ---------- 배너 데이터 ---------- */
+const MAIN_BANNERS = [
+  { img:"assets/images/banners/MAIN_BANNER1.jpg", sub:"데일리 LED 두피 케어 라이프", head:"NEW 업그레이드<br>루미에어 2.0" },
+  { img:"assets/images/banners/MAIN_BANNER2.jpg" },
+  { img:"assets/images/banners/MAIN_BANNER3.jpg", sub:"가전을 넘어 공간을 완성하는 오브제", head:"BLDC 서큘레이터<br>에어뮤즈" },
+];
+const CATEGORY_BANNERS = {
+  dryer:    { img:"assets/images/banners/DRYER_BANNER.jpg", sub:"전세계 어디든 강력한 바람", head:"프리볼티지 드라이기<br>프리고" },
+  styler:   { img:"assets/images/banners/STYLER_BANNER.jpg", sub:"Salon to Home", head:"나의 퍼스널 스타일링 파트너<br>BLOWSET" },
+  haircare: { img:"assets/images/banners/HAIR_CARE_BANNER.jpg", sub:"집에서 완성하는 프로페셔널 케어", head:"프리미엄 헤어케어<br>로아띠" },
+  life:     { img:"assets/images/banners/BYTULZ_BANNER.jpg", sub:"당신이 일상에 더 집중할 수 있도록", head:"일상을 쉽게,<br>BYTULZ 음식물처리기", reverse:true },
+};
+
+function renderMainBannerHTML(){
+  const slides = MAIN_BANNERS.map(b=>`
+    <div class="banner-slide">
+      <img src="${b.img}" draggable="false">
+      ${b.sub||b.head?`<div class="banner-text${b.reverse?' reverse':''}">${b.sub?`<div class="sub">${b.sub}</div>`:''}${b.head?`<div class="head">${b.head}</div>`:''}</div>`:''}
+    </div>`).join('');
+  const dots = MAIN_BANNERS.map((_,i)=>`<span class="${i===0?'active':''}" onclick="bannerGoTo(${i})"></span>`).join('');
+  return `
+  <div class="banner-wrap" id="main-banner-wrap">
+    <div class="banner-slides" id="main-banner-slides">${slides}</div>
+    <button class="banner-arrow prev" onclick="bannerPrev()">&#8249;</button>
+    <button class="banner-arrow next" onclick="bannerNext()">&#8250;</button>
+    <div class="banner-dots" id="main-banner-dots">${dots}</div>
+  </div>`;
+}
+function renderCategoryBannerHTML(key){
+  const b = CATEGORY_BANNERS[key];
+  if(!b) return '';
+  return `
+  <div class="cat-banner">
+    <div style="position:relative;">
+      <img src="${b.img}">
+      ${b.sub||b.head?`<div class="banner-text${b.reverse?' reverse':''}">${b.sub?`<div class="sub">${b.sub}</div>`:''}${b.head?`<div class="head">${b.head}</div>`:''}</div>`:''}
+    </div>
+  </div>`;
+}
+let bannerIndex = 0;
+function bannerGoTo(i){
+  bannerIndex = (i + MAIN_BANNERS.length) % MAIN_BANNERS.length;
+  const track = document.getElementById('main-banner-slides');
+  if(!track) return;
+  track.style.transform = `translateX(-${bannerIndex*100}%)`;
+  document.querySelectorAll('#main-banner-dots span').forEach((d,i)=>d.classList.toggle('active', i===bannerIndex));
+}
+function bannerPrev(){ bannerGoTo(bannerIndex-1); }
+function bannerNext(){ bannerGoTo(bannerIndex+1); }
+function initBannerDrag(){
+  const track = document.getElementById('main-banner-slides');
+  if(!track) return;
+  let startX=0, deltaX=0, dragging=false;
+  const wrap = document.getElementById('main-banner-wrap');
+  const onDown = (x)=>{ dragging=true; startX=x; deltaX=0; track.classList.add('dragging'); };
+  const onMove = (x)=>{ if(!dragging) return; deltaX = x-startX; track.style.transform = `translateX(calc(-${bannerIndex*100}% + ${deltaX}px))`; };
+  const onUp = ()=>{
+    if(!dragging) return; dragging=false; track.classList.remove('dragging');
+    if(Math.abs(deltaX) > 60){ deltaX<0 ? bannerNext() : bannerPrev(); } else { bannerGoTo(bannerIndex); }
+  };
+  wrap.addEventListener('mousedown', e=>{ onDown(e.clientX); e.preventDefault(); });
+  window.addEventListener('mousemove', e=>onMove(e.clientX));
+  window.addEventListener('mouseup', onUp);
+  wrap.addEventListener('touchstart', e=>onDown(e.touches[0].clientX), {passive:true});
+  wrap.addEventListener('touchmove', e=>onMove(e.touches[0].clientX), {passive:true});
+  wrap.addEventListener('touchend', onUp);
+}
 
 const CATEGORIES = [
   { key:'dryer',   label:'DRYER' },
@@ -1016,7 +1103,7 @@ function productCard(p){
 /* ---------- 홈 (카테고리별 TOP4) ---------- */
 function renderHome(){
   const el = document.getElementById('view-home');
-  el.innerHTML = CATEGORIES.map(c=>{
+  el.innerHTML = renderMainBannerHTML() + CATEGORIES.map(c=>{
     const items = sortByPopularity(PRODUCTS.filter(p=>p.cat===c.key)).slice(0,4);
     return `
     <section class="cat-section">
@@ -1027,6 +1114,8 @@ function renderHome(){
       <div class="grid top4">${items.map(productCard).join('')}</div>
     </section>`;
   }).join('') + `<div class="mock-note">※ 카드 디자인·배지·문구는 목업 기준이며 실제 데이터 반영 시 조정될 수 있습니다.</div>`;
+  bannerIndex = 0;
+  initBannerDrag();
 }
 
 /* ---------- 카테고리 전체보기 ---------- */
@@ -1040,6 +1129,7 @@ function showCategoryView(key, sortMode){
   const el = document.getElementById('view-category');
   el.innerHTML = `
     <div class="back-row"><button onclick="showView('home')">← 홈으로</button></div>
+    ${renderCategoryBannerHTML(key)}
     <div class="view-title">${cat.label} 전체 모델</div>
     <div class="cat-sort-row">
       <span class="view-sub" style="margin:0;">총 ${items.length}개 모델</span>
