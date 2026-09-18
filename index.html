@@ -99,10 +99,11 @@
     content:''; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:var(--brand);
   }
   nav.cats .dash-link{
-    margin-left:auto; display:flex; align-items:center; gap:6px;
+    display:flex; align-items:center; gap:6px;
     font-family:'Space Grotesk','Pretendard',sans-serif;
     color:var(--brand); font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
   }
+  nav.cats .dash-link.first-right{ margin-left:auto; }
   nav.cats .dash-link.active{ color:var(--brand); }
 
   main{ max-width:var(--maxw); margin:0 auto; padding:8px 16px 140px; }
@@ -522,8 +523,6 @@
 </head>
 <body>
 
-<div class="notice-strip">🚧 목업 화면입니다 — 실제 사양·이미지·가격·KPI 데이터는 취합 완료 후 반영됩니다</div>
-
 <header class="top">
   <div class="top-inner">
     <div class="brand" onclick="showView('home')">
@@ -550,7 +549,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.7</span>
+    <span class="ver">V7.9</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -697,7 +696,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.7';
+const APP_VERSION = 'V7.9';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1068,7 +1067,7 @@ function renderNav(activeKey){
   nav.innerHTML = CATEGORIES.map(c=>
     `<button data-cat="${c.key}" class="${c.key===activeKey?'active':''}" onclick="showCategoryView('${c.key}')">${c.label}</button>`
   ).join('')
-  + `<button class="dash-link ${activeKey==='guide'?'active':''}" onclick="showView('guide')">이용방법</button>`
+  + `<button class="dash-link first-right ${activeKey==='guide'?'active':''}" onclick="showView('guide')">이용방법</button>`
   + `<button class="dash-link ${activeKey==='dashboard'?'active':''}" onclick="showView('dashboard')">DASHBOARD</button>`;
 }
 
@@ -1216,7 +1215,7 @@ function renderHome(){
       </div>
       <div class="grid top4">${items.map(productCard).join('')}</div>
     </section>`;
-  }).join('') + `<div class="mock-note">※ 카드 디자인·배지·문구는 목업 기준이며 실제 데이터 반영 시 조정될 수 있습니다.</div>`;
+  }).join('');
   bannerIndex = 0;
   initBannerDrag();
 }
