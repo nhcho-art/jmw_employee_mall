@@ -516,7 +516,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V6.7</span>
+    <span class="ver">V6.8</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -641,7 +641,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V6.7';
+const APP_VERSION = 'V6.8';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -669,6 +669,10 @@ const CATEGORIES = [
 ];
 
 const PRODUCT_IMAGES = {
+"M8001A": "assets/images/M8001A.jpg",
+"MS8001A-B": "assets/images/MS8001A-B.jpg",
+"MS7001A": "assets/images/MS7001A.jpg",
+"MS7002B": "assets/images/MS7002B.jpg",
 "STL7001A": "assets/images/STL7001A.jpg",
 "STL7002B": "assets/images/STL7002B.jpg",
 "STL7101A": "assets/images/STL7101A.jpg",
@@ -682,7 +686,7 @@ const PRODUCT_IMAGES = {
 "CMCA12-0001": "assets/images/CMCA12-0001.jpg",
 "CMCA16-0001": "assets/images/CMCA16-0001.jpg",
 "M5001A": "assets/images/M5001A.jpg",
-"M5150R": "assets/images/M5150R.png",
+"M5150R": "assets/images/M5150R.jpg",
 "M5001A PLUS": "assets/images/M5001A_PLUS.jpg",
 "MF5001A": "assets/images/MF5001A.jpg",
 "MF5002B": "assets/images/MF5002B.jpg",
@@ -817,10 +821,10 @@ const PRODUCTS = [
   { id:'p45', cat:"dryer", model:"MCS6003C", name:"Touch ON [터치온] 화이트", emp:64000, released:"2021.06", specs:{"모터":"BLDC", "와트":"1650W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"366g / (코드,노즐 제외", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"화이트", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 93 ℃ / 2단: 115 ℃ / 3단: 132 ℃", "풍속":"1단: 8.5m / s / 2단: 10.7m / s / 3단: 12.5m / s", "기능":"Auto Pause / (터치센서) / Safe Mode / (세이프 모드)"} },
   { id:'p46', cat:"dryer", model:"MCS6004D", name:"Touch ON [터치온] 오션 그레이", emp:64000, released:"2021.06", specs:{"모터":"BLDC", "와트":"1650W급", "사이즈":"210x210x60mm / (노즐제외)", "무게":"366g / (코드,노즐 제외", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"오션그레이", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 93 ℃ / 2단: 115 ℃ / 3단: 132 ℃", "풍속":"1단: 8.5m / s / 2단: 10.7m / s / 3단: 12.5m / s", "기능":"Auto Pause / (터치센서) / Safe Mode / (세이프 모드)"} },
   { id:'p47', cat:"dryer", model:"MVF6A01A", name:"FREEGO [프리고]", emp:69000, released:"2025.02.", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000370", specs:{"모터":"BLDC", "와트":"1800W급", "사이즈":"코드제외 / (펼쳤을때) / 272x225mm / (접었을때) / 272x109mm", "무게":"430g / (코드제외)", "스위치":"4단(OFF-1-2-3) / Cool shot", "코드길이":"2m", "색상":"모브크림", "노즐 구성":"노즐1종 / : 이중구조 쿨 노즐", "풍온":"(220V기준) / 1단: 98.8 ℃ / 2단: 112.4 ℃ / 3단: 120℃", "풍속":"(220V기준) / 1단: 7.5m / s / 2단: 10.6 m / s / 3단:13.5m / s", "기능":"Anion / EMI / 스마트 메모리"} },
-  { id:'p48', cat:"dryer", model:"MS7002B", name:"AIR SENS [에어센스] 블랙", emp:85000, released:"2019.03", specs:{"모터":"BLDC", "와트":"1.700W급", "사이즈":"250x280x72mm", "무게":"424g", "스위치":"Speed(+,-) 5단 / Temp(Cool shot) 3단", "코드길이":"2.5m", "색상":"블랙", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"[미온풍] / Min: 85℃ / Max: 112℃ / [온풍] / Min: 94℃ / Max: 140℃", "풍속":"1단: 5.9m / s / 2단: 7.47m / s / 3단: 9.61m / s / 4단: 11.8m / s / 5단: 13.5m / s", "기능":"Anion generator / 스마트메모리"} },
-  { id:'p49', cat:"dryer", model:"MS7001A", name:"AIR SENS [에어센스] 화이트 & 로즈골드", emp:85000, released:"2019.12", specs:{"모터":"BLDC", "와트":"1.700W급", "사이즈":"250x280x72mm", "무게":"424g", "스위치":"Speed(+,-) 5단 / Temp(Cool shot) 3단", "코드길이":"2.5m", "색상":"화이트 & 로즈골드", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"[미온풍] / Min: 85℃ / Max: 112℃ / [온풍] / Min: 94℃ / Max: 140℃", "풍속":"1단: 5.9m / s / 2단: 7.47m / s / 3단: 9.61m / s / 4단: 11.8m / s / 5단: 13.5m / s", "기능":"Anion generator / 스마트메모리"} },
-  { id:'p50', cat:"dryer", model:"M8001A", name:"AIR COLLECTION Pro [에어 컬렉션 프로]", emp:125000, released:"2019.11", specs:{"모터":"ADVANCED / POWER / DIGITAL / BLDC", "와트":"1,800W급", "사이즈":"(노즐제외) / 225x270x65mm", "무게":"430g", "스위치":"Cool Shot, / Speed(+,-) 6단 / Temp(+,-) 5단", "코드길이":"3m", "색상":"네이비", "풍온":"Min: 59℃ / Max: 148℃", "풍속":"1단: 4.5m / s / 2단: 6.5m / s / 3단: 8.3m / s / 4단: 10m / s / 5단: 11.5m / s / 6단: 14m / s", "기능":"세라믹 코팅 / Anion generator, / 스마트메모리기능"} },
-  { id:'p51', cat:"dryer", model:"MS8001A-B", name:"AIR COLLECTION [에어 컬렉션 더 블랙 마스터 에디션]", emp:108000, released:"2025.12", specs:{"모터":"ADVANCED / POWER / DIGITAL / BLDC", "와트":"1,800W급", "사이즈":"(노즐제외) / 225x270x65mm", "무게":"430g", "스위치":"Cool Shot, / Speed(+,-) 6단 / Temp(+,-) 5단", "코드길이":"2.5m", "색상":"매트블랙", "풍온":"Min: 59℃ / Max: 148℃", "풍속":"1단: 4.5m / s / 2단: 6.5m / s / 3단: 8.3m / s / 4단: 10m / s / 5단: 11.5m / s / 6단: 14m / s", "기능":"세라믹 코팅 / Anion generator, / 스마트메모리기능"} },
+  { id:'p48', cat:"dryer", model:"MS7002B", name:"AIR SENS [에어센스] 블랙", emp:85000, released:"2019.03", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=86", specs:{"모터":"BLDC", "와트":"1.700W급", "사이즈":"250x280x72mm", "무게":"424g", "스위치":"Speed(+,-) 5단 / Temp(Cool shot) 3단", "코드길이":"2.5m", "색상":"블랙", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"[미온풍] / Min: 85℃ / Max: 112℃ / [온풍] / Min: 94℃ / Max: 140℃", "풍속":"1단: 5.9m / s / 2단: 7.47m / s / 3단: 9.61m / s / 4단: 11.8m / s / 5단: 13.5m / s", "기능":"Anion generator / 스마트메모리"} },
+  { id:'p49', cat:"dryer", model:"MS7001A", name:"AIR SENS [에어센스] 화이트 & 로즈골드", emp:85000, released:"2019.12", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000009", specs:{"모터":"BLDC", "와트":"1.700W급", "사이즈":"250x280x72mm", "무게":"424g", "스위치":"Speed(+,-) 5단 / Temp(Cool shot) 3단", "코드길이":"2.5m", "색상":"화이트 & 로즈골드", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"[미온풍] / Min: 85℃ / Max: 112℃ / [온풍] / Min: 94℃ / Max: 140℃", "풍속":"1단: 5.9m / s / 2단: 7.47m / s / 3단: 9.61m / s / 4단: 11.8m / s / 5단: 13.5m / s", "기능":"Anion generator / 스마트메모리"} },
+  { id:'p50', cat:"dryer", model:"M8001A", name:"AIR COLLECTION Pro [에어 컬렉션 프로]", emp:125000, released:"2019.11", url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000008", specs:{"모터":"ADVANCED / POWER / DIGITAL / BLDC", "와트":"1,800W급", "사이즈":"(노즐제외) / 225x270x65mm", "무게":"430g", "스위치":"Cool Shot, / Speed(+,-) 6단 / Temp(+,-) 5단", "코드길이":"3m", "색상":"네이비", "풍온":"Min: 59℃ / Max: 148℃", "풍속":"1단: 4.5m / s / 2단: 6.5m / s / 3단: 8.3m / s / 4단: 10m / s / 5단: 11.5m / s / 6단: 14m / s", "기능":"세라믹 코팅 / Anion generator, / 스마트메모리기능"} },
+  { id:'p51', cat:"dryer", model:"MS8001A-B", name:"AIR COLLECTION [에어 컬렉션 더 블랙 마스터 에디션]", emp:108000, released:"2025.12", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000593", specs:{"모터":"ADVANCED / POWER / DIGITAL / BLDC", "와트":"1,800W급", "사이즈":"(노즐제외) / 225x270x65mm", "무게":"430g", "스위치":"Cool Shot, / Speed(+,-) 6단 / Temp(+,-) 5단", "코드길이":"2.5m", "색상":"매트블랙", "풍온":"Min: 59℃ / Max: 148℃", "풍속":"1단: 4.5m / s / 2단: 6.5m / s / 3단: 8.3m / s / 4단: 10m / s / 5단: 11.5m / s / 6단: 14m / s", "기능":"세라믹 코팅 / Anion generator, / 스마트메모리기능"} },
   { id:'p52', cat:"dryer", model:"STL7001A", name:"LUMIAIR [루미에어] 차콜 그레이", emp:190000, released:"2021.01", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000046", specs:{"모터":"BLDC", "와트":"1,500W", "사이즈":"143x220x76mm / (노즐제외)", "무게":"460g", "스위치":"4단 풍속조절 버튼 / 4단 온도조절 버튼 / Cool Shot / LED Mode", "코드길이":"2.5m", "색상":"차콜 그레이", "노즐 구성":"노즐 3종 / : 집중노즐 / : 브러시노즐 / : 두피케어노즐", "풍온":"1단: 40~110 ℃ / 2단: 45~120 ℃ / 3단: 65~130 ℃ / 4단: 80~145 ℃ / *풍속에 따라 상이", "풍속":"1단 : 6~7m / s / 2단 : 9~10 m / s / 3단: 11~11.5m / s / 4단: 13~13.5m / s", "기능":"3가지파장 LED케어 / 프리셋 LAH CARE™ / 토출구 항균코팅"} },
   { id:'p53', cat:"dryer", model:"STL7002B", name:"LUMIAIR [루미에어] 메탈릭 핑크", emp:190000, released:"2024.05", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000047", specs:{"모터":"BLDC", "와트":"1,500W", "사이즈":"143x220x76mm / (노즐제외)", "무게":"460g", "스위치":"4단 풍속조절 버튼 / 4단 온도조절 버튼 / Cool Shot / LED Mode", "코드길이":"2.5m", "색상":"메탈릭 핑크", "노즐 구성":"노즐 3종 / : 집중노즐 / : 브러시노즐 / : 두피케어노즐", "풍온":"1단: 40~110 ℃ / 2단: 45~120 ℃ / 3단: 65~130 ℃ / 4단: 80~145 ℃ / *풍속에 따라 상이", "풍속":"1단 : 6~7m / s / 2단 : 9~10 m / s / 3단: 11~11.5m / s / 4단: 13~13.5m / s", "기능":"3가지파장 LED케어 / 프리셋 LAH CARE™ / 토출구 항균코팅"} },
   { id:'p54', cat:"dryer", model:"STL7101A", name:"LUMIAIR 2.0 [루미에어 2.0]", emp:190000, released:"2024.05", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000187", specs:{"모터":"BLDC", "와트":"1,500W", "사이즈":"143x220x76mm / (노즐제외)", "무게":"460g", "스위치":"4단 풍속조절 버튼 / 4단 온도조절 버튼 / Cool Shot / LED Mode", "코드길이":"2.5m", "색상":"오트 베이지", "노즐 구성":"자석노즐 (3종)", "풍온":"1단: 40~110 ℃ / 2단: 45~120 ℃ / 3단: 65~130 ℃ / 4단: 80~145 ℃ / *풍속에 따라 상이", "풍속":"1단 : 6~7m / s / 2단 : 9~10 m / s / 3단: 11.5~12m / s / 4단: 14~14.5m / s", "기능":"3가지파장 LED케어 / 프리셋 LAH CARE™ / 토출구 항균코팅"} },
