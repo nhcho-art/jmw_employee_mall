@@ -538,7 +538,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.2</span>
+    <span class="ver">V7.3</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -685,7 +685,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.2';
+const APP_VERSION = 'V7.3';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1711,7 +1711,7 @@ function submitOrder(){
 /* ---------- 대시보드: 실제 ERP 데이터 연동 ---------- */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNmEf7NKTERNwkAggf4OCxIi2fQkWqW7p_KoVmTKuPfMAdDUqdy4IsAvUFNtPs82x3sw/exec';
 // 주문서 제출용 Apps Script Web App URL — 배포 후 여기에 URL을 채워주세요. 비어있으면 목업으로만 동작합니다.
-const ORDER_APPS_SCRIPT_URL = '';
+const ORDER_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwndyfy3LHkqWb_a99kOi7ifiDqGAfrTBtijg1vA7uzQu_yBN6zkzaFoe5XYjhikjx8Ag/exec';
 const CAT_LABEL = { dryer:'드라이어', styler:'스타일러', haircare:'헤어케어', acc:'악세사리', life:'생활가전', etc:'미분류' };
 
 function normModel(s){ return String(s||'').toUpperCase().replace(/[\s_-]/g,''); }
