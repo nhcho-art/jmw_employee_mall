@@ -153,6 +153,9 @@
   .badge-row{ position:absolute; top:8px; left:8px; display:flex; gap:4px; }
   .badge.fv{ background:var(--brand); color:#fff; }
   .badge.cs{ background:#6B6560; color:#fff; }
+  .badge.so{ background:#B4402A; color:#fff; }
+  .soldout-tag{ display:inline-block; margin-left:8px; font-size:11px; font-weight:700; color:#B4402A; background:rgba(180,64,42,.1); padding:2px 7px; border-radius:4px; vertical-align:middle; }
+  .restock-note{ font-size:11.5px; color:var(--muted); margin:-4px 0 8px; }
   .badge{ font-size:10.5px; font-weight:700; padding:3px 7px; border-radius:4px; background:#fff; color:var(--ink); box-shadow:0 1px 4px rgba(0,0,0,.3); position:relative; z-index:5; }
 
   .card-body{ padding:12px 14px 14px; display:flex; flex-direction:column; gap:8px; flex:1; }
@@ -551,7 +554,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.15</span>
+    <span class="ver">V7.16</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -714,7 +717,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.15';
+const APP_VERSION = 'V7.16';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1002,7 +1005,7 @@ const PRODUCTS = [
   { id:'p62', cat:"dryer", model:"SDN3A1A", name:"데일로", emp:33000, released:"2026.06", url:"https://www.kurly.com/goods/1001763064", specs:{"모터":"BLDC", "정격전압":"220-240V / 50-60Hz", "와트":"1300-1500W", "사이즈":"241x64x60mm", "무게":"320g", "스위치":"온도 스위치(냉풍-미온풍-온풍-열풍-냉온풍순환) / / 풍속 스위치(1-3단) / 전원스위치", "코드길이":"1.9m", "색상":"아이보리", "풍온":"미온풍: 56.4 / 온풍: 70.3 / 열풍: 93.2", "기화측정기준":"1단:7.2m / s / 2단: 7.7m / s / 3단:9.5m / s", "임시노출기준":"1단: 8.2m / s / 2단: 8.7m / s / 3단: 10.5m / s", "기능":"음이온 / 셀프클리닝"} },
   { id:'p63', cat:"dryer", model:"SDF4B1A", name:"케어부스터 FV", emp:59000, released:"2026.07", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000723", specs:{"모터":"BLDC", "정격전압":"100-240V~, 50-60Hz", "와트":"1000-1300W", "사이즈":"280x90x70mm", "무게":"350g", "스위치":"온도 스위치(냉풍-온풍-열풍-냉온풍순환) / 풍속(1-2단)", "코드길이":"2m", "색상":"화이트", "풍온":"온풍: 76.7℃ / 열풍: 92.7℃ / (220V 기준)", "기화측정기준":"1단 :6.8m / s / 2단 : 9.2 m / s / (220V기준)", "임시노출기준":"1단: 10.0m / s / 2단: 13.9m / s / (220V기준)", "기능":"100-240v 프리볼트 / 음이온 / 셀프클리닝"} },
   { id:'p64', cat:"dryer", model:"SDS3A1A", name:"올핏", emp:79000, released:"2026.07", url:"https://www.kurly.com/goods/1002425416", specs:{"모터":"BLDC", "정격전압":"220-240V / 50-60Hz", "와트":"1200W", "사이즈":"283x42x43.5mm", "무게":"350g", "스위치":"풍속(1-3단) / 길게 누르면 헤어케어모드 / / 온도(냉풍-미온풍-온풍-열풍) / 길게 누르면 냉온풍 순환 / 전원스위치", "코드길이":"2m", "색상":"그레이", "풍온":"미온풍: 61.3℃ / 온풍: 83.1℃ / 열풍: 96.1℃", "기화측정기준":"1단: 6.1m / s / 2단: 7.1m / s / 3단: 8.3m / s", "임시노출기준":"1단: 8.8m / s / 2단: 9.8m / s / 3단: 11.0m / s", "기능":"워터이온 / 헤어케어모드 / 3종노즐", "기타":"스웨이드 파우치 포함"} },
-  { id:'p65', cat:"dryer", model:"SAT3A2B", name:"블로우셋 프로", emp:89000, released:"2026.07", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000733", specs:{"모터":"BLDC", "정격전압":"220V / 60Hz", "와트":"1400W", "사이즈":"340x46x46mm", "무게":"345g", "스위치":"온도 스위치(냉풍-온풍-열풍-냉온풍순환) / 풍속(1-3단)", "코드길이":"3m", "색상":"그레이", "노즐 구성":"8종노즐(집중노즐,소프트노즐,스무딩브러시,32mm컬링배럴(좌 / 우),볼륨브러시,와이드볼륨브러시, 디퓨저)", "풍온":"온풍: 72.8 / 열풍100.1", "기화측정기준":"1단:5.6m / s / 2단: 6.7m / s / 3단: 7.7m / s", "임시노출기준":"1단: 10.4m / s / 2단: 11.5m / s / 3단: 12.5m / s", "기능":"음이온 / 셀프클리닝", "기타":"거치대:320 x 154 x 17mm / 파우치:340 x 290 x 145mm(펼쳤을때) / 집중노즐 96.5x 45.2 x 65.5mm / 소프트노즐: 90 x 72 x 56.4mm / 스무딩브러시150 x 60.5 x 54mm / 32mm컬링배럴(좌 / 우) 191x 40 x 40mm / 볼륨브러시: 143.6x82x82mm / 와이드볼륨브러시 170 x 97 x 77mm / 디퓨저 119.7 x 119.7 x 89.4mm"} },
+  { id:'p65', cat:"dryer", model:"SAT3A2B", name:"블로우셋 프로", emp:89000, released:"2026.07", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000733", soldOut:true, restock:null, specs:{"모터":"BLDC", "정격전압":"220V / 60Hz", "와트":"1400W", "사이즈":"340x46x46mm", "무게":"345g", "스위치":"온도 스위치(냉풍-온풍-열풍-냉온풍순환) / 풍속(1-3단)", "코드길이":"3m", "색상":"그레이", "노즐 구성":"8종노즐(집중노즐,소프트노즐,스무딩브러시,32mm컬링배럴(좌 / 우),볼륨브러시,와이드볼륨브러시, 디퓨저)", "풍온":"온풍: 72.8 / 열풍100.1", "기화측정기준":"1단:5.6m / s / 2단: 6.7m / s / 3단: 7.7m / s", "임시노출기준":"1단: 10.4m / s / 2단: 11.5m / s / 3단: 12.5m / s", "기능":"음이온 / 셀프클리닝", "기타":"거치대:320 x 154 x 17mm / 파우치:340 x 290 x 145mm(펼쳤을때) / 집중노즐 96.5x 45.2 x 65.5mm / 소프트노즐: 90 x 72 x 56.4mm / 스무딩브러시150 x 60.5 x 54mm / 32mm컬링배럴(좌 / 우) 191x 40 x 40mm / 볼륨브러시: 143.6x82x82mm / 와이드볼륨브러시 170 x 97 x 77mm / 디퓨저 119.7 x 119.7 x 89.4mm"} },
   { id:'p66', cat:"dryer", model:"SAT3A1A", name:"블로우셋", emp:75000, released:"2026.08", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000731", specs:{"모터":"BLDC", "정격전압":"220V / 60Hz", "와트":"1400W", "사이즈":"340x46x46mm", "무게":"345g", "스위치":"온도 스위치(냉풍-온풍-열풍-냉온풍순환) / 풍속(1-3단)", "코드길이":"2m", "색상":"아이보리", "노즐 구성":"5종노즐(집중노즐,스무딩브러시,32mm컬링배럴(좌 / 우),볼륨브러시", "풍온":"온풍: 72.8 / 열풍100.1", "기화측정기준":"1단:5.6m / s / 2단: 6.7m / s / 3단: 7.7m / s", "임시노출기준":"1단: 10.4m / s / 2단: 11.5m / s / 3단: 12.5m / s", "기능":"음이온 / 셀프클리닝", "기타":"거치대:320 x 154 x 17mm / 파우치(별매): 340 x 160 x 170mm / 집중노즐 96.5x 45.2 x 65.5mm / 스무딩브러시 150 x 60.5 x 54mm / 32mm컬링배럴(좌 / 우)191x 40 x 40mm / 볼륨브러시:143.6x82x82mm"} },
   { id:'p67', cat:"dryer", model:"SDMF4A1A", name:"볼티", emp:54000, released:"2026.08", url:"https://www.musinsa.com/products/6897474", specs:{"모터":"BLDC", "정격전압":"100-240V~, 50-60Hz", "와트":"900-1100W", "사이즈":"245x85x60mm", "무게":"270g", "스위치":"온도 스위치(냉풍-온풍-열풍-냉온풍순환) / 풍속(2단)", "코드길이":"2m", "색상":"그레이", "풍온":"냉풍: 실온 / 온풍: 74.4℃ / 열풍: 81.4℃", "기화측정기준":"1단 :5.4m / s / 2단 : 8.1m / s / (220V기준)", "임시노출기준":"1단: 9.8m / s / 2단: 12.5m / s / (220V기준)", "기능":"음이온, / 셀프클리닝", "기타":"스웨이드 파우치 포함 / 파우치 200x300mm"} },
   { id:'p68', cat:"styler", model:"W2010ME", name:"W2010ME", emp:33000, released:"2020.04", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000019", specs:{"히터":"PTC", "열판":"세라믹", "제어방식/안전장치":"이중안전장치", "열판사이즈":"85x25mm", "사이즈":"260x32x30mm", "무게":"210g(코드제외)", "코드길이":"2m", "색상":"블랙&쿠퍼골드", "온도범위":"4단(130, 160, 180, 210도)", "기능":"슬립모드 / (30분)"} },
@@ -1120,6 +1123,7 @@ function renderGuide(){
         </ol>
         <div class="guide-note">📍 배송지가 여러 곳이라면 한 번에 담지 말고 <b>배송지별로 따로 담아서 따로 주문</b>해주세요.</div>
         <div class="guide-note">🧴 <b>헤어케어 제품만</b> 주문하실 경우 택배비 문제로 1개 단독 주문이 불가하며, <b>총 2개 이상</b> 담아야 합니다 (모델을 섞어서 담아도 됩니다). 단, 드라이기·스타일러 등 다른 카테고리와 함께 담으면 헤어케어 1개도 가능합니다.</div>
+        <div class="guide-note">🚚 <b>전 품목 당일 오전 11시 이전 주문 시 당일 출고</b>됩니다.</div>
         <div class="guide-note">💳 계좌이체 선택 시 계좌번호 옆 "복사" 버튼으로 바로 복사할 수 있습니다.</div>
       </section>
 
@@ -1138,6 +1142,7 @@ function renderGuide(){
         <ul class="guide-list">
           <li><b>정렬 기준</b> — 카테고리 페이지에서 "출시순"(최신 출시 우선) / "인기순"(당해년도 ERP 판매량 기준) 선택 가능합니다.</li>
           <li><b>COMING SOON 뱃지</b> — 아직 사진 또는 가격이 확정되지 않은 상품이며, 담기가 비활성화되어 있습니다.</li>
+          <li><b>품절 뱃지</b> — 가격은 확인 가능하나 현재 재고가 없어 담기가 비활성화된 상품입니다. 가격 옆에 입고 예정일(또는 "입고 일정 미정")이 함께 표시됩니다.</li>
           <li><b>프리볼트 뱃지</b> — 해외에서도(100~240V) 사용 가능한 모델에 표시됩니다.</li>
           <li><b>검색</b> — 상단 검색창에 모델명 또는 품번을 입력하면 사양 값까지 함께 검색됩니다.</li>
         </ul>
@@ -1207,11 +1212,12 @@ function productCard(p){
   const qty = cart[p.id]?.qty || 0;
   const checked = compareSet.has(p.id);
   const noPrice = p.emp===null || p.emp===undefined;
+  const disableBuy = noPrice || p.soldOut;
   const img = PRODUCT_IMAGES[p.model];
   return `
   <div class="card" onclick="viewSingleProduct('${p.id}')">
     <div class="thumb" style="background:${img?'#fff':colorFor(idx)}">
-      <div class="badge-row">${p.best?'<span class="badge">BEST</span>':''}${isFreeVoltage(p)?'<span class="badge fv">프리볼트</span>':''}${p.comingSoon?'<span class="badge cs">COMING SOON</span>':''}</div>
+      <div class="badge-row">${p.best?'<span class="badge">BEST</span>':''}${isFreeVoltage(p)?'<span class="badge fv">프리볼트</span>':''}${p.comingSoon?'<span class="badge cs">COMING SOON</span>':''}${p.soldOut?'<span class="badge so">품절</span>':''}</div>
       <div class="cmp-box ${checked?'checked':''}" data-id="${p.id}" onclick="event.stopPropagation(); toggleCompare('${p.id}', this)">✓</div>
       ${img?`<img src="${img}" style="width:100%;height:100%;object-fit:contain;">`:p.model}
     </div>
@@ -1219,15 +1225,16 @@ function productCard(p){
       <div class="model-code">품번 ${p.model}${p.released?` · 출시 ${p.released}`:''}</div>
       <div class="name">${p.name}</div>
       <div class="price-row">
-        ${noPrice ? `<span style="color:var(--muted);font-size:13px;">${p.comingSoon?'COMING SOON':'가격 확인중'}</span>` : `<span class="emp-price">${p.emp.toLocaleString('ko-KR')}</span><span class="won">원</span>`}
+        ${noPrice ? `<span style="color:var(--muted);font-size:13px;">${p.comingSoon?'COMING SOON':'가격 확인중'}</span>` : `<span class="emp-price">${p.emp.toLocaleString('ko-KR')}</span><span class="won">원</span>${p.soldOut?'<span class="soldout-tag">품절</span>':''}`}
       </div>
+      ${p.soldOut ? `<div class="restock-note">${p.restock ? p.restock+' 입고예정' : '입고 일정 미정'}</div>` : ''}
       <div class="qty-row">
         <div class="stepper">
-          <button onclick="event.stopPropagation(); stepQty('${p.id}',-1)" ${noPrice?'disabled':''}>–</button>
+          <button onclick="event.stopPropagation(); stepQty('${p.id}',-1)" ${disableBuy?'disabled':''}>–</button>
           <span id="qty-${p.id}">${qty}</span>
-          <button onclick="event.stopPropagation(); stepQty('${p.id}',1)" ${noPrice?'disabled':''}>+</button>
+          <button onclick="event.stopPropagation(); stepQty('${p.id}',1)" ${disableBuy?'disabled':''}>+</button>
         </div>
-        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')" ${noPrice?'disabled style="opacity:.5;cursor:not-allowed;"':''}>담기</button>
+        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')" ${disableBuy?'disabled style="opacity:.5;cursor:not-allowed;"':''}>담기</button>
       </div>
     </div>
   </div>`;
@@ -1318,6 +1325,7 @@ function stepQty(id, delta){
 function addToCart(id){
   const p = PRODUCTS.find(p=>p.id===id);
   if(p.emp===null || p.emp===undefined){ alert('아직 가격이 확정되지 않은 상품입니다.'); return; }
+  if(p.soldOut){ alert('현재 품절된 상품입니다.'+(p.restock?(' ('+p.restock+' 입고예정)'):' (입고 일정 미정)')); return; }
   const qty = pendingQty[id] ?? (cart[id]?.qty||0);
   const finalQty = qty>0 ? qty : 1;
   cart[id] = { ...p, qty: finalQty };
@@ -1446,7 +1454,7 @@ function bulkAddToCart(){
   let added=0, skipped=0;
   ids.forEach(id=>{
     const p = PRODUCTS.find(p=>p.id===id);
-    if(!p || p.emp===null || p.emp===undefined){ skipped++; return; }
+    if(!p || p.emp===null || p.emp===undefined || p.soldOut){ skipped++; return; }
     const qty = pendingQty[id] ?? (cart[id]?.qty || 1);
     cart[id] = { ...p, qty: qty>0?qty:1 };
     setQtyDisplay(id, cart[id].qty);
@@ -1550,6 +1558,7 @@ function openCompareModal(idsOverride){
     const specRows = p.specs ? Object.entries(p.specs).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('') : '';
     const inCompare = compareSet.has(p.id);
     const noPrice = p.emp===null || p.emp===undefined;
+    const disableBuy = noPrice || p.soldOut;
     content.innerHTML = `
       <div class="single-view">
         <div class="single-photo">${PRODUCT_IMAGES[p.model] ? `<img src="${PRODUCT_IMAGES[p.model]}" style="width:100%;height:100%;object-fit:contain;">` : `<div class="cmp-thumb" style="background:${colorFor(idx)}">${p.model}</div>`}</div>
@@ -1557,11 +1566,12 @@ function openCompareModal(idsOverride){
           <div class="single-crumb">${catLabel}</div>
           <div class="single-title">${p.name}</div>
           <div class="single-sub">품번 ${p.model}</div>
-          <div class="single-badges">${p.released?`<span>출시 ${p.released}</span>`:''}${isFreeVoltage(p)?'<span>프리볼트</span>':''}</div>
-          <div class="single-price">${p.emp!=null ? fmt(p.emp) : (p.comingSoon?'COMING SOON':'가격 확인중')}</div>
+          <div class="single-badges">${p.released?`<span>출시 ${p.released}</span>`:''}${isFreeVoltage(p)?'<span>프리볼트</span>':''}${p.soldOut?'<span style="color:#B4402A;">품절</span>':''}</div>
+          <div class="single-price">${p.emp!=null ? fmt(p.emp) : (p.comingSoon?'COMING SOON':'가격 확인중')}${p.soldOut?'<span class="soldout-tag">품절</span>':''}</div>
+          ${p.soldOut ? `<div class="restock-note">${p.restock ? p.restock+' 입고예정' : '입고 일정 미정'}</div>` : ''}
           ${specRows ? `<table class="single-spec">${specRows}</table>` : `<div style="color:var(--muted);font-size:13px;margin-bottom:18px;">등록된 사양 정보가 없습니다.</div>`}
           <div class="single-actions">
-            <button class="single-add-btn" ${noPrice?'disabled':''} onclick="addToCart('${p.id}')">🛒 장바구니 담기</button>
+            <button class="single-add-btn" ${disableBuy?'disabled':''} onclick="addToCart('${p.id}')">🛒 장바구니 담기</button>
             <button class="single-link-btn" style="border-color:var(--border);color:var(--ink);${inCompare?'opacity:.5;':''}" ${inCompare?'disabled':''} onclick="addToCompareFromSingle('${p.id}', this)">${inCompare?'✓ 비교함에 담김':'+ 비교함에 담기'}</button>
             ${p.url?`<a href="${p.url}" target="_blank" rel="noopener" class="single-link-btn">쇼핑몰에서 보기 ↗</a>`:''}
           </div>
@@ -1584,10 +1594,10 @@ function openCompareModal(idsOverride){
       </th>`;
     }).join('');
 
-    const priceRow = `<tr><td><b>직원가</b></td>${items.map(p=>`<td style="color:var(--gold);font-weight:700;">${p.emp!=null?fmt(p.emp):(p.comingSoon?'COMING SOON':'가격 확인중')}</td>`).join('')}</tr>`;
+    const priceRow = `<tr><td><b>직원가</b></td>${items.map(p=>`<td style="color:var(--gold);font-weight:700;">${p.emp!=null?fmt(p.emp):(p.comingSoon?'COMING SOON':'가격 확인중')}${p.soldOut?' (품절)':''}</td>`).join('')}</tr>`;
     const cartRow = `<tr><td></td>${items.map(p=>{
-      const noPrice = p.emp===null || p.emp===undefined;
-      return `<td><button class="cmp-cart-btn" ${noPrice?'disabled':''} onclick="addToCart('${p.id}')">🛒 장바구니 담기</button></td>`;
+      const disableBuy = (p.emp===null || p.emp===undefined) || p.soldOut;
+      return `<td><button class="cmp-cart-btn" ${disableBuy?'disabled':''} onclick="addToCart('${p.id}')">🛒 장바구니 담기</button></td>`;
     }).join('')}</tr>`;
 
     const specRows = specKeys.length ? specKeys.map(k=>{
