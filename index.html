@@ -221,6 +221,7 @@
     background:#fff; color:var(--brand); border:none; border-radius:100px;
     padding:9px 22px; font-size:13.5px; font-weight:700; cursor:pointer;
   }
+  .compare-bar button.go.cart{ background:transparent; color:#fff; border:1.5px solid #fff; }
   .compare-bar button.clear{ background:none; border:none; color:rgba(255,255,255,.75); font-size:13px; cursor:pointer; text-decoration:underline; }
 
   /* ---- Compare modal ---- */
@@ -509,15 +510,16 @@
   .banner-dots span.active{ background:#fff; }
   .cat-banner img{ width:100%; height:auto; display:block; }
   /* ---------- 이용방법 ---------- */
-  .guide-section{ margin-bottom:30px; padding-bottom:26px; border-bottom:1px solid var(--border); }
-  .guide-section:last-child{ border-bottom:none; }
-  .guide-section h3{ font-size:16px; margin-bottom:14px; }
+  .guide-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:760px){ .guide-grid{ grid-template-columns:1fr; } }
+  .guide-box{ border:1px solid var(--border); border-radius:12px; padding:20px 22px; background:var(--surface); }
+  .guide-box h3{ font-size:16px; margin-bottom:14px; }
   .guide-steps{ list-style:none; padding:0; display:flex; flex-direction:column; gap:10px; }
-  .guide-steps li{ font-size:13.5px; line-height:1.6; color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .guide-steps li{ font-size:13.5px; line-height:1.6; color:var(--ink); background:var(--card-bg,#fff); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
   .guide-steps li b{ display:block; margin-bottom:2px; color:var(--brand); }
   .guide-list{ list-style:disc; padding-left:20px; display:flex; flex-direction:column; gap:8px; }
   .guide-list li{ font-size:13.5px; line-height:1.6; color:var(--ink); }
-  .guide-note{ margin-top:12px; font-size:12.5px; color:var(--muted); background:var(--surface); border-radius:8px; padding:10px 12px; }
+  .guide-note{ margin-top:12px; font-size:12.5px; color:var(--muted); background:var(--card-bg,#fff); border-radius:8px; padding:10px 12px; }
   .hl{ color:var(--brand); font-weight:700; }
 </style>
 </head>
@@ -549,7 +551,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.13</span>
+    <span class="ver">V7.14</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -559,6 +561,7 @@
 <div class="compare-bar" id="compareBar">
   <span class="cnt" id="compareCnt">0개 선택됨</span>
   <button class="go" onclick="openCompareModal()">제품 비교하기</button>
+  <button class="go cart" onclick="bulkAddToCart()">장바구니 담기</button>
   <button class="clear" onclick="clearCompare()">선택 해제</button>
 </div>
 
@@ -711,7 +714,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.13';
+const APP_VERSION = 'V7.14';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1104,40 +1107,51 @@ function renderGuide(){
     <div class="view-title">이용방법</div>
     <div class="view-sub" style="margin-bottom:22px;">임직원 MALL을 처음 쓰시는 분들을 위한 간단 안내입니다</div>
 
-    <section class="guide-section">
-      <h3>🛒 주문하는 방법 및 순서</h3>
-      <ol class="guide-steps">
-        <li><b>① 상품 담기</b> — 원하는 모델의 수량을 정하고 <span class="hl">담기</span> 버튼을 누르면 장바구니에 추가됩니다.</li>
-        <li><b>② 계속 쇼핑 또는 주문서 이동</b> — 담은 직후 뜨는 팝업에서 다른 상품을 더 담을지, 바로 주문서로 갈지 선택합니다.</li>
-        <li><b>③ 단품출고 안내 확인</b> — 직원구매는 모델 단품만 출고되며, 자사몰·타 쇼핑몰의 패키지 구성품/사은품은 포함되지 않는다는 안내가 뜹니다. 확인 후 다음으로 진행합니다.</li>
-        <li><b>④ 주문서 작성</b> — 소속부서, 주문자, 수령인, 배송지를 입력합니다. "수령인 정보 주문자와 동일" 체크박스를 해제하면 다른 사람 앞으로도 보낼 수 있습니다.</li>
-        <li><b>⑤ 결제수단 선택</b> — 계좌이체 선택 시 화면에 뜨는 계좌번호로 입금 후 입금자명·입금여부를 입력합니다. 카드결제는 영업지원팀 문경현 대리에게 별도로 문의해주세요.</li>
-        <li><b>⑥ 발주하기</b> — 모든 필수 항목 입력 후 발주하기를 누르면 주문이 접수됩니다.</li>
-      </ol>
-      <div class="guide-note">📍 배송지가 여러 곳이라면 한 번에 담지 말고 <b>배송지별로 따로 담아서 따로 주문</b>해주세요.</div>
-      <div class="guide-note">🧴 <b>헤어케어 제품만</b> 주문하실 경우 택배비 문제로 1개 단독 주문이 불가하며, <b>총 2개 이상</b> 담아야 합니다 (모델을 섞어서 담아도 됩니다). 단, 드라이기·스타일러 등 다른 카테고리와 함께 담으면 헤어케어 1개도 가능합니다.</div>
-      <div class="guide-note">💳 계좌이체 선택 시 계좌번호 옆 "복사" 버튼으로 바로 복사할 수 있습니다.</div>
-    </section>
+    <div class="guide-grid">
+      <section class="guide-box">
+        <h3>🛒 주문하는 방법 및 순서</h3>
+        <ol class="guide-steps">
+          <li><b>① 상품 담기</b> — 원하는 모델의 수량을 정하고 <span class="hl">담기</span> 버튼을 누르면 장바구니에 추가됩니다.</li>
+          <li><b>② 계속 쇼핑 또는 주문서 이동</b> — 담은 직후 뜨는 팝업에서 다른 상품을 더 담을지, 바로 주문서로 갈지 선택합니다.</li>
+          <li><b>③ 단품출고 안내 확인</b> — 직원구매는 모델 단품만 출고되며, 자사몰·타 쇼핑몰의 패키지 구성품/사은품은 포함되지 않는다는 안내가 뜹니다. 확인 후 다음으로 진행합니다.</li>
+          <li><b>④ 주문서 작성</b> — 소속부서, 주문자, 수령인, 배송지를 입력합니다. "수령인 정보 주문자와 동일" 체크박스를 해제하면 다른 사람 앞으로도 보낼 수 있습니다.</li>
+          <li><b>⑤ 결제수단 선택</b> — 계좌이체 선택 시 화면에 뜨는 계좌번호로 입금 후 입금자명·입금여부를 입력합니다. 카드결제는 영업지원팀 문경현 대리에게 별도로 문의해주세요.</li>
+          <li><b>⑥ 발주하기</b> — 모든 필수 항목 입력 후 발주하기를 누르면 주문이 접수됩니다.</li>
+        </ol>
+        <div class="guide-note">📍 배송지가 여러 곳이라면 한 번에 담지 말고 <b>배송지별로 따로 담아서 따로 주문</b>해주세요.</div>
+        <div class="guide-note">🧴 <b>헤어케어 제품만</b> 주문하실 경우 택배비 문제로 1개 단독 주문이 불가하며, <b>총 2개 이상</b> 담아야 합니다 (모델을 섞어서 담아도 됩니다). 단, 드라이기·스타일러 등 다른 카테고리와 함께 담으면 헤어케어 1개도 가능합니다.</div>
+        <div class="guide-note">💳 계좌이체 선택 시 계좌번호 옆 "복사" 버튼으로 바로 복사할 수 있습니다.</div>
+      </section>
 
-    <section class="guide-section">
-      <h3>⚖️ 제품 비교하는 방법</h3>
-      <ol class="guide-steps">
-        <li><b>① 비교할 제품 체크</b> — 각 제품 카드 우측 상단의 체크박스를 선택합니다. (PC 최대 4개, 모바일 최대 2개)</li>
-        <li><b>② 하단 "비교하기" 바 클릭</b> — 화면 하단에 뜨는 바를 눌러야 비교창이 열립니다. (카드를 그냥 클릭하면 비교가 아니라 제품 상세정보가 열립니다)</li>
-        <li><b>③ 비교표 확인</b> — 무게·가격 등 항목별로 더 우수한 쪽이 강조 표시되고, 인사이트 문구도 함께 제공됩니다.</li>
-      </ol>
-    </section>
+      <section class="guide-box">
+        <h3>⚖️ 제품 비교 / 여러 개 한번에 담기</h3>
+        <ol class="guide-steps">
+          <li><b>① 비교(또는 담을) 제품 체크</b> — 각 제품 카드 우측 상단의 체크박스를 선택합니다. 개수 제한 없이 원하는 만큼 선택 가능합니다.</li>
+          <li><b>② 하단 바에서 선택</b> — 화면 하단에 뜨는 바에서 "제품 비교하기"(최대 4개, 모바일 2개까지만 가능) 또는 "장바구니 담기"(개수 제한 없음)를 누릅니다.</li>
+          <li><b>③ 결과 확인</b> — 비교하기는 무게·가격 등 항목별 비교표+인사이트가 뜨고, 장바구니 담기는 체크된 상품이 (미리 정해둔 수량, 없으면 1개씩) 한 번에 담깁니다.</li>
+        </ol>
+        <div class="guide-note">📍 카드를 체크박스 말고 그냥 클릭하면 비교/일괄담기가 아니라 제품 상세정보가 열립니다.</div>
+      </section>
 
-    <section class="guide-section">
-      <h3>🔎 정렬 및 기타 안내</h3>
-      <ul class="guide-list">
-        <li><b>정렬 기준</b> — 카테고리 페이지에서 "출시순"(최신 출시 우선) / "인기순"(당해년도 ERP 판매량 기준) 선택 가능합니다.</li>
-        <li><b>COMING SOON 뱃지</b> — 아직 사진 또는 가격이 확정되지 않은 상품이며, 담기가 비활성화되어 있습니다.</li>
-        <li><b>프리볼트 뱃지</b> — 해외에서도(100~240V) 사용 가능한 모델에 표시됩니다.</li>
-        <li><b>검색</b> — 상단 검색창에 모델명 또는 품번을 입력하면 사양 값까지 함께 검색됩니다.</li>
-        <li><b>문의</b> — 우측 하단 구글챗 아이콘을 누르면 영업지원팀 문경현 대리에게 바로 문의할 수 있습니다.</li>
-      </ul>
-    </section>`;
+      <section class="guide-box">
+        <h3>🔎 정렬 및 뱃지 안내</h3>
+        <ul class="guide-list">
+          <li><b>정렬 기준</b> — 카테고리 페이지에서 "출시순"(최신 출시 우선) / "인기순"(당해년도 ERP 판매량 기준) 선택 가능합니다.</li>
+          <li><b>COMING SOON 뱃지</b> — 아직 사진 또는 가격이 확정되지 않은 상품이며, 담기가 비활성화되어 있습니다.</li>
+          <li><b>프리볼트 뱃지</b> — 해외에서도(100~240V) 사용 가능한 모델에 표시됩니다.</li>
+          <li><b>검색</b> — 상단 검색창에 모델명 또는 품번을 입력하면 사양 값까지 함께 검색됩니다.</li>
+        </ul>
+      </section>
+
+      <section class="guide-box">
+        <h3>💬 문의하기</h3>
+        <ul class="guide-list">
+          <li>우측 하단 <b>구글챗 아이콘</b>을 누르면 구글챗으로 이동됩니다.</li>
+          <li><b>영업지원팀 문경현 대리</b>에게 문의해주세요.</li>
+          <li>문경현 대리 부재 시 <b>이민이 과장</b>에게 문의해주세요.</li>
+        </ul>
+      </section>
+    </div>`;
 }
 
 /* ---------- 카드 렌더 ---------- */
@@ -1403,8 +1417,6 @@ function toggleCompare(id, el){
   if(compareSet.has(id)){
     compareSet.delete(id); el.classList.remove('checked');
   } else {
-    const max = getMaxCompare();
-    if(compareSet.size>=max){ alert('제품 비교는 최대 '+max+'개까지 선택할 수 있습니다.'); return; }
     compareSet.add(id); el.classList.add('checked');
   }
   renderCompareBar();
@@ -1426,6 +1438,24 @@ function clearCompare(){
   document.querySelectorAll('.cmp-box.checked').forEach(el=>el.classList.remove('checked'));
   renderCompareBar();
   closeCompareModal();
+}
+function bulkAddToCart(){
+  const max = getMaxCompare();
+  const ids = [...compareSet];
+  if(ids.length===0) return;
+  let added=0, skipped=0;
+  ids.forEach(id=>{
+    const p = PRODUCTS.find(p=>p.id===id);
+    if(!p || p.emp===null || p.emp===undefined){ skipped++; return; }
+    const qty = pendingQty[id] ?? (cart[id]?.qty || 1);
+    cart[id] = { ...p, qty: qty>0?qty:1 };
+    setQtyDisplay(id, cart[id].qty);
+    added++;
+  });
+  saveCart(cart);
+  renderCartUI();
+  if(skipped>0) alert(added+'개 담았습니다. (가격 미정 '+skipped+'개는 제외됨)');
+  else document.getElementById('addedModalOverlay').classList.add('show');
 }
 
 // 무게처럼 작을수록 좋은 항목. 그 외 숫자 항목은 클수록 좋은 것으로 간주.
@@ -1501,6 +1531,10 @@ function addToCompareFromSingle(id, btnEl){
 
 function openCompareModal(idsOverride){
   const ids = idsOverride || [...compareSet];
+  if(!idsOverride){
+    const max = getMaxCompare();
+    if(ids.length>max){ alert('제품 비교는 최대 '+max+'개까지 가능합니다. 비교할 상품을 '+max+'개 이하로 줄여주세요.'); return; }
+  }
   const items = PRODUCTS.filter(p=>ids.includes(p.id));
   if(items.length===0){ closeCompareModal(); return; }
 
