@@ -554,7 +554,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.16</span>
+    <span class="ver">V7.18</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -717,7 +717,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.16';
+const APP_VERSION = 'V7.18';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -832,8 +832,6 @@ const PRODUCT_IMAGES = {
 "MS6031E": "assets/images/MS6031E.jpg",
 "MS6041F": "assets/images/MS6041F.jpg",
 "MS6030C": "assets/images/MS6030C.jpg",
-"MS6020B": "assets/images/MS6020B.jpg",
-"MS6010A": "assets/images/MS6010A.jpg",
 "MCS6004D": "assets/images/MCS6004D.jpg",
 "MCS6003C": "assets/images/MCS6003C.jpg",
 "M8001A": "assets/images/M8001A.jpg",
@@ -971,8 +969,6 @@ const PRODUCTS = [
   { id:'p28', cat:"dryer", model:"MF6002B", name:"LUX WHITE [럭스 화이트]", emp:51000, released:"2018.11", url:"https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000216659&chlNo=6&chlDtlNo=201", specs:{"모터":"BLDC", "와트":"1,700W", "사이즈":"300x250mm", "무게":"440g", "스위치":"3단(Off-Low-High), Cool", "코드길이":"2m", "색상":"화이트", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 102℃ / 2단: 148℃", "풍속":"1단: 8.12m / s / 2단: 11.43m / s", "기능":"음이온, / 전자파차단"} },
   { id:'p29', cat:"dryer", model:"MF6003C", name:"LUX [럭스] 실버", emp:51000, released:"2019.04", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=90", specs:{"모터":"BLDC", "와트":"1,700W", "사이즈":"300x250mm", "무게":"440g", "스위치":"3단(Off-Low-High), Cool", "코드길이":"2m", "색상":"실버", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단: 102℃ / 2단: 148℃", "풍속":"1단: 8.12m / s / 2단: 11.43m / s", "기능":"음이온, / 전자파차단"} },
   { id:'p30', cat:"dryer", model:"MS6001A", name:"PHANTOM [팬텀]", emp:52000, released:"2017.04", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=56", specs:{"모터":"BLDC", "와트":"1,600W급", "사이즈":"240x280x70mm", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"화이트", "풍온":"1단 : 100.0 ℃ / 2단 : 140.0 ℃ / 3단 : 130.0 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
-  { id:'p31', cat:"dryer", model:"MS6020B", name:"AIR JET [에어젯] 블랙", emp:52000, released:"2017.04", url:"http://www.jmwkorea.com/shop/item.php?it_id=1901010056", specs:{"모터":"BLDC", "와트":"1,600W급", "사이즈":"240x280x70mm", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"블랙", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단 : 100.0 ℃ / 2단 : 140.0 ℃ / 3단 : 130.0 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
-  { id:'p32', cat:"dryer", model:"MS6010A", name:"AIR JET [에어젯] 화이트", emp:52000, released:"2019.11", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=58", specs:{"모터":"BLDC", "와트":"1,600W급", "사이즈":"240x280x70mm", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"화이트", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단 : 100.0 ℃ / 2단 : 140.0 ℃ / 3단 : 130.0 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
   { id:'p33', cat:"dryer", model:"MS6003C", name:"PHANTOM prime [팬텀 프라임]", emp:52000, released:"2017.07", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=59", specs:{"모터":"BLDC", "와트":"1,600W급", "사이즈":"240x270x70mm / (노즐제외)", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"그레이", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "풍온":"1단 : 100.0 ℃ / 2단 : 140.0 ℃ / 3단 : 130.0 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
   { id:'p34', cat:"dryer", model:"MS6004D", name:"PHANTOM [팬텀]", emp:52000, released:"2019.04", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=91", specs:{"모터":"BLDC", "와트":"1,600W급", "사이즈":"240x270x70mm / (노즐제외)", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"연분홍", "풍온":"1단 : 100.0 ℃ / 2단 : 140.0 ℃ / 3단 : 130.0 ℃", "풍속":"1단 : 7.0 m / s / 2단 : 9.5 m / s / 3단 : 11.5 m / s", "기능":"Anion generator"} },
   { id:'p35', cat:"dryer", model:"MS6100A", name:"PHANTOM prime XP [팬텀 프라임 XP]", emp:52000, released:"2019.12", url:"https://prod.danawa.com/info/?pcode=10612299", specs:{"모터":"BLDC", "와트":"1650W급", "사이즈":"240x270x70mm / (노즐제외)", "무게":"468g", "스위치":"4단(Off-Low-High-Turbo), Cool Shot", "코드길이":"2m", "색상":"웜그레이 & 쿠퍼", "노즐 구성":"노즐 2종 / : 이중구조 쿨 노즐 / : 컬링 노즐", "기능":"Anion generator"} },
@@ -1123,7 +1119,8 @@ function renderGuide(){
         </ol>
         <div class="guide-note">📍 배송지가 여러 곳이라면 한 번에 담지 말고 <b>배송지별로 따로 담아서 따로 주문</b>해주세요.</div>
         <div class="guide-note">🧴 <b>헤어케어 제품만</b> 주문하실 경우 택배비 문제로 1개 단독 주문이 불가하며, <b>총 2개 이상</b> 담아야 합니다 (모델을 섞어서 담아도 됩니다). 단, 드라이기·스타일러 등 다른 카테고리와 함께 담으면 헤어케어 1개도 가능합니다.</div>
-        <div class="guide-note">🚚 <b>전 품목 당일 오전 11시 이전 주문 시 당일 출고</b>됩니다.</div>
+        <div class="guide-note">🚚 <b>드라이기·스타일러·가전 등 일반 제품</b>은 당일 오전 11시 이전 주문 시 <b>당일 출고</b>됩니다.</div>
+        <div class="guide-note">🧴 <b>헤어케어(화장품)</b>는 <b>매주 수요일에만 출고</b>됩니다. 수요일 오전 11시 이전 결제 시 <b>당일 출고</b>, 그 이후 결제 시 <b>차주 수요일 출고</b>됩니다.</div>
         <div class="guide-note">💳 계좌이체 선택 시 계좌번호 옆 "복사" 버튼으로 바로 복사할 수 있습니다.</div>
       </section>
 
