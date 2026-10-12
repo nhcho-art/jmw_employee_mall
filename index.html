@@ -524,6 +524,26 @@
   .guide-list li{ font-size:13.5px; line-height:1.6; color:var(--ink); }
   .guide-note{ margin-top:12px; font-size:12.5px; color:var(--muted); background:var(--card-bg,#fff); border-radius:8px; padding:10px 12px; }
   .hl{ color:var(--brand); font-weight:700; }
+
+  /* ---------- 주문확인 ---------- */
+  .ord-search{ display:flex; gap:8px; max-width:520px; margin-bottom:20px; }
+  .ord-search input{ flex:1; padding:11px 14px; border:1px solid var(--border); border-radius:8px; font-size:14px; font-family:inherit; }
+  .ord-search button{ padding:0 22px; border:none; border-radius:8px; background:var(--brand); color:#fff; font-weight:700; font-size:14px; cursor:pointer; }
+  .ord-empty{ padding:36px 0; text-align:center; color:var(--muted); font-size:14px; }
+  .ord-card{ border:1px solid var(--border); border-radius:12px; background:var(--surface); padding:18px 20px; margin-bottom:14px; }
+  .ord-head{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-bottom:8px; }
+  .ord-head .date{ font-size:15px; font-weight:700; }
+  .ord-head .dept{ font-size:12.5px; color:var(--muted); }
+  .ord-tag{ font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:rgba(91,34,71,.1); color:var(--brand); }
+  .ord-tag.warn{ background:rgba(180,64,42,.12); color:#B4402A; }
+  .ord-meta{ font-size:12.5px; line-height:1.7; color:var(--muted); margin-bottom:10px; }
+  .ord-table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .ord-table th{ text-align:left; font-weight:600; color:var(--muted); padding:6px 8px; border-bottom:1px solid var(--border); }
+  .ord-table td{ padding:7px 8px; border-bottom:1px solid var(--border); }
+  .ord-table .num{ text-align:right; white-space:nowrap; }
+  .ord-total{ text-align:right; margin-top:10px; font-size:14px; }
+  .ord-total b{ color:var(--brand); font-size:16px; }
+  @media (max-width:600px){ .ord-table th:nth-child(1), .ord-table td:nth-child(1){ display:none; } }
 </style>
 </head>
 <body>
@@ -548,13 +568,14 @@
   <div class="view" id="view-search"></div>
   <div class="view" id="view-dashboard"></div>
   <div class="view" id="view-guide"></div>
+  <div class="view" id="view-orders"></div>
 </main>
 
 <footer class="site-footer">
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.18</span>
+    <span class="ver">V7.21</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -717,7 +738,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.18';
+const APP_VERSION = 'V7.21';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -1084,7 +1105,8 @@ function renderNav(activeKey){
   nav.innerHTML = CATEGORIES.map(c=>
     `<button data-cat="${c.key}" class="${c.key===activeKey?'active':''}" onclick="showCategoryView('${c.key}')">${c.label}</button>`
   ).join('')
-  + `<button class="dash-link first-right ${activeKey==='guide'?'active':''}" onclick="showView('guide')">이용방법</button>`
+  + `<button class="dash-link first-right ${activeKey==='orders'?'active':''}" onclick="showView('orders')">주문확인</button>`
+  + `<button class="dash-link ${activeKey==='guide'?'active':''}" onclick="showView('guide')">이용방법</button>`
   + `<button class="dash-link ${activeKey==='dashboard'?'active':''}" onclick="showView('dashboard')">DASHBOARD</button>`;
 }
 
@@ -1094,10 +1116,105 @@ function setActiveView(id){
   window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
 }
 
-function showView(name){
+function showView(name, arg){
   if(name==='home'){ renderHome(); renderNav(null); setActiveView('view-home'); }
   if(name==='dashboard'){ renderDashboard(); renderNav('dashboard'); setActiveView('view-dashboard'); }
   if(name==='guide'){ renderGuide(); renderNav('guide'); setActiveView('view-guide'); }
+  if(name==='orders'){ renderOrders(arg); renderNav('orders'); setActiveView('view-orders'); }
+}
+
+/* ---------- 주문확인 ---------- */
+let ordLookupSeq = 0;
+function escHtml(v){ return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderOrders(prefill){
+  const el = document.getElementById('view-orders');
+  el.innerHTML = `
+    <div class="view-title">주문확인</div>
+    <div class="view-sub" style="margin-bottom:22px;">주문자명 또는 수령인명을 입력하면 최근 90일 주문 내역을 확인할 수 있습니다</div>
+    <div class="ord-search">
+      <input id="ordQuery" type="text" placeholder="이름 입력 (주문자 또는 수령인)" maxlength="20" onkeydown="if(event.key==='Enter')lookupOrders()">
+      <button onclick="lookupOrders()">조회</button>
+    </div>
+    <div id="ordResult"></div>`;
+  if(prefill){
+    document.getElementById('ordQuery').value = prefill;
+    setTimeout(()=>lookupOrders(true), 1200);
+  }
+}
+
+function lookupOrders(auto){
+  const q = document.getElementById('ordQuery').value.trim();
+  const box = document.getElementById('ordResult');
+  if(q.replace(/\s/g,'').length<2){ box.innerHTML = '<div class="ord-empty">이름을 2글자 이상 입력해주세요.</div>'; return; }
+  if(!ORDER_APPS_SCRIPT_URL){ box.innerHTML = '<div class="ord-empty">주문 조회 연결이 아직 설정되지 않았습니다.</div>'; return; }
+  const seq = ++ordLookupSeq;
+  box.innerHTML = '<div class="ord-empty">주문 내역을 불러오는 중...</div>';
+  fetch(ORDER_APPS_SCRIPT_URL + '?action=lookup&name=' + encodeURIComponent(q))
+    .then(r=>r.json())
+    .then(d=>{
+      if(seq!==ordLookupSeq) return;
+      if(!d || !d.ok) throw new Error('lookup failed');
+      if(d.rows.length===0 && auto){
+        // 방금 접수한 주문은 시트 반영에 몇 초 걸릴 수 있어 한 번 더 조회
+        setTimeout(()=>{ if(seq===ordLookupSeq) lookupOrders(false); }, 2500);
+        return;
+      }
+      renderOrderResult(d.rows, q);
+    })
+    .catch(()=>{
+      if(seq!==ordLookupSeq) return;
+      box.innerHTML = '<div class="ord-empty">주문 내역을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>';
+    });
+}
+
+function renderOrderResult(rows, q){
+  const box = document.getElementById('ordResult');
+  if(!rows.length){
+    box.innerHTML = `<div class="ord-empty">"${escHtml(q)}" 이름으로 조회되는 최근 90일 주문이 없습니다.<br>방금 주문하셨다면 잠시 후 다시 조회해주세요.</div>`;
+    return;
+  }
+  // 같은 주문(주문일+주문자+수령인+주소)끼리 묶기
+  const groups = []; const idx = {};
+  rows.forEach(r=>{
+    const k = [r.date,r.orderer,r.recv,r.addr].join('|');
+    if(!(k in idx)){ idx[k] = groups.length; groups.push({key:k, head:r, items:[]}); }
+    groups[idx[k]].items.push(r);
+  });
+  // 중복 주문 가능성: 같은 날·같은 주문자·같은 품번이 서로 다른 주문에 존재
+  const seen = {};
+  groups.forEach(g=>g.items.forEach(it=>{
+    const dk = [String(g.head.date).slice(0,10), g.head.orderer, it.model].join('|');
+    (seen[dk] = seen[dk] || new Set()).add(g.key);
+  }));
+  groups.forEach(g=>{
+    g.dup = g.items.some(it=> seen[[String(g.head.date).slice(0,10), g.head.orderer, it.model].join('|')].size>1);
+  });
+
+  box.innerHTML = `<div class="view-sub" style="margin:0 0 12px;">총 ${groups.length}건 (최신순)</div>` + groups.map(g=>{
+    const h = g.head;
+    const total = g.items.reduce((s,i)=>s+(Number(i.total)||0),0);
+    const payTxt = h.pay==='계좌이체' ? `계좌이체 · ${escHtml(h.paid||'-')}` : escHtml(h.pay||'');
+    return `
+    <div class="ord-card">
+      <div class="ord-head">
+        <span class="date">${escHtml(h.date)}</span>
+        <span class="dept">${escHtml(h.dept)}</span>
+        <span class="ord-tag">${payTxt}</span>
+        ${(()=>{ const cf=String(h.confirmed||'').trim().toUpperCase(); return cf==='O' ? '<span class="ord-tag">결제확인 완료</span>' : (cf ? `<span class="ord-tag">결제확인 · ${escHtml(cf)}</span>` : '<span class="ord-tag warn">결제확인 대기</span>'); })()}
+        ${g.dup?'<span class="ord-tag warn">중복 주문 가능성</span>':''}
+      </div>
+      <div class="ord-meta">
+        주문자 ${escHtml(h.orderer)} · 수령인 ${escHtml(h.recv)}${h.phone?' · '+escHtml(h.phone):''}<br>
+        ${escHtml(h.addr)}${h.shipReq?`<br>출고요청일 ${escHtml(h.shipReq)}`:''}
+      </div>
+      <table class="ord-table">
+        <thead><tr><th>품번</th><th>품명</th><th class="num">수량</th><th class="num">단가</th><th class="num">금액</th></tr></thead>
+        <tbody>${g.items.map(i=>`<tr><td>${escHtml(i.model)}</td><td>${escHtml(i.itemName)}</td><td class="num">${Number(i.qty).toLocaleString('ko-KR')}</td><td class="num">${Number(i.emp).toLocaleString('ko-KR')}원</td><td class="num">${(Number(i.total)||0).toLocaleString('ko-KR')}원</td></tr>`).join('')}</tbody>
+      </table>
+      <div class="ord-total">합계 <b>${total.toLocaleString('ko-KR')}원</b></div>
+    </div>`;
+  }).join('');
 }
 
 function renderGuide(){
@@ -1116,6 +1233,7 @@ function renderGuide(){
           <li><b>④ 주문서 작성</b> — 소속부서, 주문자, 수령인, 배송지를 입력합니다. "수령인 정보 주문자와 동일" 체크박스를 해제하면 다른 사람 앞으로도 보낼 수 있습니다.</li>
           <li><b>⑤ 결제수단 선택</b> — 계좌이체 선택 시 화면에 뜨는 계좌번호로 입금 후 입금자명·입금여부를 입력합니다. 카드결제는 영업지원팀 문경현 대리에게 별도로 문의해주세요.</li>
           <li><b>⑥ 발주하기</b> — 모든 필수 항목 입력 후 발주하기를 누르면 주문이 접수됩니다.</li>
+          <li><b>⑦ 주문 내역 확인</b> — 접수 직후 자동으로 <span class="hl">주문확인</span> 화면으로 이동합니다. 이후에도 상단 "주문확인" 메뉴에서 주문자명 또는 수령인명을 입력하면 최근 90일 주문 내역(주문일·품목·수량·금액·입금여부)을 언제든 확인할 수 있습니다.</li>
         </ol>
         <div class="guide-note">📍 배송지가 여러 곳이라면 한 번에 담지 말고 <b>배송지별로 따로 담아서 따로 주문</b>해주세요.</div>
         <div class="guide-note">🧴 <b>헤어케어 제품만</b> 주문하실 경우 택배비 문제로 1개 단독 주문이 불가하며, <b>총 2개 이상</b> 담아야 합니다 (모델을 섞어서 담아도 됩니다). 단, 드라이기·스타일러 등 다른 카테고리와 함께 담으면 헤어케어 1개도 가능합니다.</div>
@@ -1824,9 +1942,10 @@ function submitOrder(){
   const finish = (ok)=>{
     if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = '발주하기'; }
     if(ok){
-      alert('주문이 접수되었습니다.');
+      alert('주문이 접수되었습니다. 주문확인 화면에서 내역을 확인하실 수 있습니다.');
       cart = {}; saveCart(cart); renderCartUI();
       closeOrderModal();
+      if(ORDER_APPS_SCRIPT_URL) showView('orders', name);
     } else {
       alert('주문 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주시거나 영업지원팀으로 문의해주세요.');
     }
