@@ -506,11 +506,14 @@
   .banner-text.reverse{ display:flex; flex-direction:column; }
   .banner-text .head .accent{ color:var(--brand); }
   .banner-text.pos-br{ left:auto; right:5%; top:auto; bottom:8%; transform:none; text-align:right; max-width:44%; }
+  .banner-text.pos-cr{ left:auto; right:6%; top:50%; transform:translateY(-50%); max-width:32%; text-align:left; }
+  .banner-text .sub .ngen{ letter-spacing:.25em; font-weight:500; color:#111; margin-left:4px; }
   .banner-arrow{ position:absolute; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.85); border:none; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; z-index:5; box-shadow:0 1px 4px rgba(0,0,0,.15); }
   .banner-arrow.prev{ left:12px; } .banner-arrow.next{ right:12px; }
   .banner-dots{ position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:5; }
   .banner-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.55); cursor:pointer; }
   .banner-dots span.active{ background:#fff; }
+  @media (max-width:600px){ .banner-arrow{ width:26px; height:26px; font-size:13px; } .banner-arrow.prev{ left:6px; } .banner-arrow.next{ right:6px; } .banner-text.pos-cr{ right:11%; max-width:44%; } .banner-text.pos-cr .head{ font-size:11px; white-space:nowrap; } .banner-text.pos-cr .sub{ font-size:8.5px; margin-bottom:4px; white-space:nowrap; } .banner-text.pos-cr .sub .ngen{ letter-spacing:.15em; } }
   .cat-banner img{ width:100%; height:auto; display:block; }
   /* ---------- 이용방법 ---------- */
   .guide-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
@@ -575,7 +578,7 @@
   <div class="inner">
     <span>© 2026 JMW Korea. All rights reserved.</span>
     <span class="sep">|</span>
-    <span class="ver">V7.21</span>
+    <span class="ver">V7.26</span>
     <span class="sep">|</span>
     <span>구매 및 업데이트 문의는 JMW 영업지원팀으로 연락 바랍니다.</span>
   </div>
@@ -738,7 +741,7 @@
 
 <script>
 /* ---------- 버전 ---------- */
-const APP_VERSION = 'V7.21';
+const APP_VERSION = 'V7.26';
 
 /* ---------- 우클릭/복제 방지 (참고: 클라이언트단 저지 수준, 완전 차단은 불가) ---------- */
 document.addEventListener('contextmenu', e=>e.preventDefault());
@@ -759,6 +762,7 @@ function fmt(n){ return n.toLocaleString('ko-KR')+'원'; }
 
 /* ---------- 배너 데이터 ---------- */
 const MAIN_BANNERS = [
+  { img:"assets/images/banners/NGEN_BANNER.jpg", sub:'NEXT IS NOW <span class="ngen">N GEN</span>', head1:"작아진 것은 크기 뿐,", head2:"JMW 바람 그대로", pos:"cr" },
   { img:"assets/images/banners/MAIN_BANNER1.jpg", sub:"데일리 LED 두피 케어 라이프", head1:"NEW 업그레이드", head2:"루미에어 2.0" },
   { img:"assets/images/banners/MAIN_BANNER2.jpg", sub:"집에서 완성하는 프로페셔널 케어", head1:"프리미엄 헤어케어", head2:"로아띠" },
   { img:"assets/images/banners/MAIN_BANNER3.jpg", sub:"가전을 넘어 공간을 완성하는 오브제", head1:"BLDC 서큘레이터", head2:"에어뮤즈" },
@@ -772,7 +776,7 @@ const CATEGORY_BANNERS = {
 
 function bannerTextHTML(b){
   if(!b.sub && !b.head1 && !b.head2) return '';
-  const posClass = b.pos==='br' ? ' pos-br' : '';
+  const posClass = b.pos==='br' ? ' pos-br' : (b.pos==='cr' ? ' pos-cr' : '');
   return `<div class="banner-text${b.reverse?' reverse':''}${posClass}">${b.sub?`<div class="sub">${b.sub}</div>`:''}${(b.head1||b.head2)?`<div class="head">${b.head1||''}${b.head1&&b.head2?'<br>':''}${b.head2?`<span class="accent">${b.head2}</span>`:''}</div>`:''}</div>`;
 }
 function renderMainBannerHTML(){
@@ -911,6 +915,9 @@ const PRODUCT_IMAGES = {
 "SDMF4A1A": "assets/images/SDMF4A1A.jpg",
 "Stand-04B(C)": "assets/images/Stand-04B(C).jpg",
 "Stand-04W(C)": "assets/images/Stand-04W(C).jpg",
+"NM3A01A": "assets/images/NM3A01A.jpg",
+"NM3A02B": "assets/images/NM3A02B.jpg",
+"STAND-04(NM3A)": "assets/images/STAND-04(NM3A).jpg",
 "M3060F": "assets/images/M3060F.jpg",
 "M3150R": "assets/images/M3150R.jpg",
 "MC3A01A": "assets/images/MC3A01A.jpg",
@@ -1076,6 +1083,9 @@ const PRODUCTS = [
   { id:'p115', cat:"acc", model:"MS70", name:"MS70 디퓨저", emp:9500, released:null, url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=87", specs:null },
   { id:'p116', cat:"acc", model:"Stand-04B(C)", name:"드라이기 거치대 블랙", emp:5000, released:null, url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000008", specs:null },
   { id:'p116b', cat:"acc", model:"Stand-04W(C)", name:"드라이기 거치대 화이트", emp:5000, released:null, url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000008", specs:null },
+  { id:'p121', cat:"dryer", model:"NM3A01A", name:"N-GEN [뉴젠] 코튼크림", emp:49000, released:"2026.10", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000776", specs:{"모터":"BLDC", "와트":"1400W급", "사이즈":"160x210x58mm(노즐,코드러버제외) / 65x35x50mm(노즐)", "무게":"350g(노즐,코드제외)", "스위치":"슬라이드 풍속 스위치 3단(1-2-3) / 디지털 온도 택트버튼(냉풍,미온풍,온풍,순환풍(롱키진입))", "코드길이":"2m", "색상":"코튼크림", "노즐 구성":"1종 마그네틱 이중구조 노즐", "풍온":"[미온풍] 1단 62℃ / 2단 72℃ / 3단 88℃ / [온풍] 1단 76℃ / 2단 85℃ / 3단 116℃", "풍속":"1단: 7.5m/s / 2단: 10.5m/s / 3단: 12.5m/s", "기능":"LED온도표기 / 순환풍(온풍10초,냉풍7초) / 사용자 온도기억(전원OFF전 사용 온도 토출) / Anion/EMI"} },
+  { id:'p122', cat:"dryer", model:"NM3A02B", name:"N-GEN [뉴젠] 샌드베이지", emp:49000, released:"2026.10", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000768", specs:{"모터":"BLDC", "와트":"1400W급", "사이즈":"160x210x58mm(노즐,코드러버제외) / 65x35x50mm(노즐)", "무게":"350g(노즐,코드제외)", "스위치":"슬라이드 풍속 스위치 3단(1-2-3) / 디지털 온도 택트버튼(냉풍,미온풍,온풍,순환풍(롱키진입))", "코드길이":"2m", "색상":"샌드베이지", "노즐 구성":"1종 마그네틱 이중구조 노즐", "풍온":"[미온풍] 1단 62℃ / 2단 72℃ / 3단 88℃ / [온풍] 1단 76℃ / 2단 85℃ / 3단 116℃", "풍속":"1단: 7.5m/s / 2단: 10.5m/s / 3단: 12.5m/s", "기능":"LED온도표기 / 순환풍(온풍10초,냉풍7초) / 사용자 온도기억(전원OFF전 사용 온도 토출) / Anion/EMI"} },
+  { id:'p123', cat:"acc", model:"STAND-04(NM3A)", name:"뉴젠 전용 드라이기 거치대", emp:5000, released:"2026.10", url:"https://www.jmwmall.co.kr/goods/goods_view.php?goodsNo=1000000782", specs:null },
   { id:'p117', cat:"styler", model:"HCS7001A", name:"POWER SWING [파워스윙]", emp:86000, released:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000097", specs:null },
   { id:'p118', cat:"styler", model:"HC5002B", name:"POWER SLIM [파워슬림]", emp:59000, released:null, url:"https://www.jmwprofessional.com/goods/goods_view.php?goodsNo=1000000096", specs:null },
   { id:'p119', cat:"acc", model:"FA-DRY_A", name:"바이툴즈 음식물처리기 건조통", emp:null, released:null, specs:null, url:"https://bytulz.co.kr/product/detail.html?product_no=33&cate_no=50&display_group=1", comingSoon:true },
